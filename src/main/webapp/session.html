@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>VMN</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <h1 id="session-title">Virtual Movie Night</h1>
+    <div id="session-screen">
+    </div>
+    <img src="https://uxwing.com/list-square-bullet-icon/" 
+        id="attendee-list" onclick="openAttendeeContainer()"
+        alt="Once clicked contains information about who is in the session">  <!-- only open if display of attendee-container is none -->
+    <div id="attendee-container">
+      <span id="close" onclick="closeAttendeeContainer()">X</span>
+    </div> <!-- onlick of close just make display none -->
+  </body>
+</html>
