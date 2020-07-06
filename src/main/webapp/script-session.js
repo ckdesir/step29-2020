@@ -20,6 +20,8 @@ let sessionScreen;
 // does not, that person has left. If the session info has someone, but the attendee array doesn't,
 // that person is new.
 let attendeeArray = new Array();
+let sessionInformation;
+let isNotConnected = true;
 
 /**
  * This waits until the webpage loads and then it calls the
@@ -32,7 +34,21 @@ window.onload = function() { main(); }
  */
 function main() {
   remoteToSession();
+  //two poll classes, one for session info and another for updating database
+  ///object1.poll();
+  //object2.poll();
+  //refresh();    //uppdates value client side
 }
+
+function refresh() {
+  setTimeout(() => {
+    sessionInformation = sessionInformationPoll.result();
+    updateController();
+    updateSessionInfoAttendees();
+  }, cadence);
+}
+
+//maybe also have a function outside that setTimesout, getting result
 
 /**
  * function remoteToSession() uses the noVNC library
@@ -41,9 +57,8 @@ function main() {
  * given those privileges. 
  */
 function remoteToSession() {
-  const sessionInfo = getSessionInformation();
-  const url = 'wss://'+sessionInfo.instanceIP+':6080';
-  status('Connecting');
+  sessionInformation = sessionInformationRequest();
+  const url = 'wss://'+sessionInformation.instanceIP+':6080';
   sessionScreen = new RFB(document.getElementById('session-screen'), url,
                 { credentials: { password: 'session-party' } });
   sessionScreen.addEventListener('connect', connectedToServer);
@@ -65,8 +80,35 @@ function openSessionInfo() {
   document.getElementById('session-info-div').style.display = 'none'; 
 }
 
+function updateSessionInfoAttendees() {
+  const updatedList = sessionInformation.attendeeArray;
+  let toastMessageArrival = 'The following people have joined the session:';
+  let toastMessageDeparture = 'The following people have left the session:';
+  let toastMessageCombined;
+  const newAttendees = new Array();
+  const attendeesThatHaveLeft = new Array();
+  for(i in updatedList) {
+    if(!attendeeArray.includes(i)) {
+      buildAttendeeDiv(i);
+      toastMessageArrival+= ' ' + i;
+      newAttendees.push(i);
+    }
+  }
+  for(i in attendeeArray) {
+    if(!updatedAttendeeArray.includes(i)) {
+      removeFromAttendeeDiv(i);
+      toastMessageDeparture+= ' ' + i;
+      attendeesThatHaveLeft.push(i);
+    }
+  }
+  if(newAttendees.length === 0) {
+  }
+
+
+}
+
 /**
- * @return the div element containing all the elements representing
+ * @return {object} the div element containing all the elements representing
  *    an attendee of the session.
  * @param {string} nameOfAttendee
  */
@@ -94,7 +136,7 @@ function copyTextToClipboard() {
 
 }
 
-function getSessionInformation() {
+function sessionInformationRequest() {
   const urlParams = new URLSearchParams(window.location.search);
   const requestBodyObject = new Object();
   requestBodyObject.sessionID = urlParams.get(session-id);
@@ -105,20 +147,27 @@ function getSessionInformation() {
   fetch(getSessionInfoRequest).then(response => response.json()).then(
     (sessionInfo) => {
       return sesionInfo;
-    });
-}
+    }
+  );
 
-function status(text) {
-  document.getElementById('status').textContent = text;
+  // fetch(getSessionInfoRequest).then(response => 
+  //   {
+  //   return response.json();
+  //   }
+  // );
 }
 
 function disconnectedFromServer(e) {
-  status("Reconnecting...");
+  // isNotConnected = true;
+  document.getElementById('status').display = 'block';
+  document.getElementById('status').textContent = 'Reconnecting...';
+  // while(isNotConnected)
   // logic that connects to a repalcement VM
 }
 
 // When this function is called we have
 // successfully connected to a server
 function connectedToServer(e) {
-  status("Connected to session");
+  document.getElementById('status').display = 'none';
+  // isNotConnected = false;
 }

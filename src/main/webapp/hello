@@ -1,0 +1,224 @@
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package com.google.sps.servlets;
+
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.compute.Compute;
+import com.google.api.services.compute.ComputeScopes;
+import com.google.api.services.compute.model.AccessConfig;
+import com.google.api.services.compute.model.AttachedDisk;
+import com.google.api.services.compute.model.AttachedDiskInitializeParams;
+import com.google.api.services.compute.model.Instance;
+import com.google.api.services.compute.model.InstanceList;
+import com.google.api.services.compute.model.Firewall;
+import com.google.api.services.compute.model.Metadata;
+import com.google.api.services.compute.model.NetworkInterface;
+import com.google.api.services.compute.model.Operation;
+import com.google.api.services.compute.model.ServiceAccount;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.gson.Gson;
+import java.io.IOException;
+import java.util.*; 
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
+
+
+/** Servlet that returns some data refrencing comments for the webpage. */
+@WebServlet("/vm")
+public class VMServlet extends HttpServlet {
+  private static final String PROJECT_ID = "cdesir-step-2020";
+  private static final String APPLICATION_NAME = "virtual-movie-night";
+  private static final String ZONE_NAME = "us-central1-a";
+  private static final String INSTANCE_NAME = "virtual-movie-instance-id";
+  private static final String SOURCE_IMAGE_PATH =
+      "eip-images/global/images/ubuntu-1804-lts-drawfork-v20200208";
+  private static final String DISK_TYPE = "PERSISTENT";
+  /** Set the path of the OS image for the sample VM instance to be created. */
+  private static final String SOURCE_IMAGE_PREFIX =
+      "https://www.googleapis.com/compute/v1/projects/";
+  private static final String NETWORK_INTERFACE_CONFIG = "ONE_TO_ONE_NAT";
+  private static final String NETWORK_ACCESS_CONFIG = "External NAT";
+  private static final String NETWORK_TIER_CONFIG = "PREMIUM";
+  /** Set the time out limit for operation calls to the Compute Engine API. */
+  private static final long OPERATION_TIMEOUT_MILLIS = 60 * 1000;
+  /** Global instance of the HTTP transport. */
+  private static HttpTransport httpTransport;
+  /** Global instance of the JSON factory. */
+  private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String sessionID = Jsoup.clean(request.getParameter("session-id"), Whitelist.basic());
+    String instanceIP = getInstances(sessionID);
+    Gson gson = new Gson();
+    String json = gson.toJson(instanceIP);
+    response.setContentType("application/json;");
+    response.getWriter().println(json);
+  }
+
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    rentVM();
+    response.sendRedirect("/index.html"); //should be redirecting to where the VM remotes? calls on JS function?
+  }
+
+  public String getInstances(String sessionID) {
+      try{
+    Compute.Instances.List instances = getCompute().instances().list(PROJECT_ID, ZONE_NAME);
+    InstanceList list = instances.execute();
+    if (list.getItems() == null) {
+      System.out.println(
+          "No instances found. Create a party session using the button above!");
+      return null;
+    } else {
+      for (Instance instance : list.getItems()) {
+        if (instance.getName().equals(INSTANCE_NAME)) {
+          System.out.println(instance.getNetworkInterfaces().get(0));
+          return instance.getNetworkInterfaces().get(0).getAccessConfigs().get(0).getNatIP();
+          //return Arrays.asList(instance);
+        }
+      }
+    }
+      }catch (IOException e) {
+          System.out.println(e.getMessage());
+      } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    return null;
+  }
+
+  public void rentVM(){
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity instanceEntity = new Entity("Instance");
+    try {
+    Operation vmOperation = startInstance(getCompute(), INSTANCE_NAME);  
+    } catch (IOException e) {
+        System.out.println(e.getMessage());
+    } catch (Throwable t) {
+        t.printStackTrace();
+    }
+  }
+
+  public static Operation startInstance(Compute compute, String instanceName) throws IOException {  
+    // Create VM Instance object with the required properties.
+    Instance instance = new Instance();
+    instance.setName(instanceName);
+    instance.setMachineType(
+        String.format(
+            "https://www.googleapis.com/compute/v1/projects/%s/zones/%s/machineTypes/f1-micro",
+            PROJECT_ID, ZONE_NAME));
+            
+    // Add Network Interface to be used by VM Instance.
+    NetworkInterface ifc = new NetworkInterface();
+    ifc.setNetwork(
+        String.format(
+            "https://www.googleapis.com/compute/v1/projects/%s/global/networks/default",
+            PROJECT_ID));
+    List<AccessConfig> configs = new ArrayList<>();
+    //List<AccessConfig> configs = updateAcessConfig(configs);
+    AccessConfig config = new AccessConfig();
+    config.setNetworkTier(NETWORK_TIER_CONFIG);
+    config.setType(NETWORK_INTERFACE_CONFIG);
+    config.setName(NETWORK_ACCESS_CONFIG);
+    configs.add(config);
+    ifc.setAccessConfigs(configs);
+    instance.setNetworkInterfaces(Collections.singletonList(ifc));
+
+    // Add attached Persistent Disk to be used by VM Instance.
+    AttachedDisk disk = new AttachedDisk();
+    disk.setBoot(true);
+    disk.setAutoDelete(true);
+    disk.setType(DISK_TYPE);
+    AttachedDiskInitializeParams params = new AttachedDiskInitializeParams();
+    // Assign the Persistent Disk the same name as the VM Instance.
+    params.setDiskName(instanceName);
+    // Specify the source operating system machine image to be used by the VM Instance.
+    params.setSourceImage(SOURCE_IMAGE_PREFIX + SOURCE_IMAGE_PATH);
+    // Specify the disk type as Standard Persistent Disk
+    params.setDiskType(
+        String.format(
+            "https://www.googleapis.com/compute/v1/projects/%s/zones/%s/diskTypes/pd-standard",
+            PROJECT_ID, ZONE_NAME));
+    disk.setInitializeParams(params);
+    instance.setDisks(Collections.singletonList(disk));
+
+    // Initialize the service account to be used by the VM Instance and set the API access scopes.
+    ServiceAccount account = new ServiceAccount();
+    account.setEmail("default");
+    List<String> scopes = new ArrayList<>();
+    scopes.add("https://www.googleapis.com/auth/devstorage.read_only");
+    scopes.add("https://www.googleapis.com/auth/logging.write");
+    scopes.add("https://www.googleapis.com/auth/monitoring.write");
+    scopes.add("https://www.googleapis.com/auth/servicecontrol");
+    scopes.add("https://www.googleapis.com/auth/service.management.readonly");
+    scopes.add("https://www.googleapis.com/auth/trace.append");
+    scopes.add("https://www.googleapis.com/auth/compute");
+    account.setScopes(scopes);
+    instance.setServiceAccounts(Collections.singletonList(account));
+
+    Metadata meta = new Metadata();
+
+    Metadata.Items item = new Metadata.Items();
+    item.setKey("startup-script-url");
+    item.setValue(String.format("gs://%s/vm-startup.sh", PROJECT_ID));
+
+    meta.setItems(Collections.singletonList(item));
+    instance.setMetadata(meta);
+
+    Compute.Instances.Insert insert = compute.instances().insert(PROJECT_ID, ZONE_NAME, instance);
+    return insert.execute();
+  }
+
+private Compute getCompute() {
+    try {
+      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+      // Authenticate using Google Application Default Credentials.
+      GoogleCredentials credential = GoogleCredentials.getApplicationDefault();
+      if (credential.createScopedRequired()) {
+        List<String> scopes = new ArrayList<>();
+        // Set Google Cloud Storage scope to Full Control.
+        scopes.add(ComputeScopes.DEVSTORAGE_FULL_CONTROL);
+        // Set Google Compute Engine scope to Read-write.
+        scopes.add(ComputeScopes.COMPUTE);
+        credential = credential.createScoped(scopes);
+      }
+      HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credential);
+      // Create Compute Engine object for listing instances.
+      return
+          new Compute.Builder(httpTransport, JSON_FACTORY, requestInitializer)
+              .setApplicationName(APPLICATION_NAME)
+              .build();
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    return null;
+}
+}

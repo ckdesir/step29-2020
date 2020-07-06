@@ -80,3 +80,10 @@ html {
   max-height: auto;
   width: auto;
 }
+
+#status {
+  background-color: #fd5d00;
+  color: white;
+  padding: 6px 5px 4px 5px;
+  border-bottom: 1px outset;
+}
