@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// RFB holds the API to connect and communicate with a VNC server   
+import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
+
+let sessionScreen;
+// Check for inclusion both ways, if attendeeArray has someone but the session info
+// does not, that person has left. If the session info has someone, but the attendee array doesn't,
+// that person is new.
+let attendeeArray = new Array();
 
 /**
  * This waits until the webpage loads and then it calls the
@@ -33,15 +41,28 @@ function main() {
  * given those privileges. 
  */
 function remoteToSession() {
-
+  const sessionInfo = getSessionInformation();
+  const url = 'wss://'+sessionInfo.instanceIP+':6080';
+  status('Connecting');
+  sessionScreen = new RFB(document.getElementById('session-screen'), url,
+                { credentials: { password: 'session-party' } });
+  sessionScreen.addEventListener('connect', connectedToServer);
+  sessionScreen.addEventListener('disconnect', disconnectedFromServer);
+  sessionScreen.addEventListener('credentialsrequired', credentialsAreRequired);
+  sessionScreen.addEventListener('desktopname', updateDesktopName);
+  // if(new URLSearchParams(window.location.search).get(name)===sessionInfo.controller) {
+  //   rfb.viewOnly = false;
+  // } else {
+  //   rfb.viewOnly = true;
+  // }
 }
 
 /**
- * function openAttendeeContainer() displays the div container
- * that has information on who is in the session.
+ * function openSessionInfo() displays the div container
+ * that has information about the session.
  */
-function openAttendeeContainer() {
-
+function openSessionInfo() {
+  document.getElementById('session-info-div').style.display = 'none'; 
 }
 
 /**
@@ -54,9 +75,50 @@ function buildAttendeeDiv(nameOfAttendee) {
 }
 
 /**
- * function closeAttendeeContainer() closes the div container
- * that has information on who is in the session.
+ * function closeSessionContainer() closes the div container
+ * that has information about the session.
  */
-function closeAttendeeContainer() {
+function closeSessionInfo() {
+  document.getElementById('session-info-div').style.display = 'block';
+}
 
+/**
+ * function copyTextToClipboard() copies the text in the input field
+ * with the id "session-id-field" into the clipboard.
+ */
+function copyTextToClipboard() {
+  const sessionIDText = document.getElementById("session-id-field");
+  sessionIDText.select();
+  document.execCommand('copy');
+  alert("Copied the text: " + sessionIDText.value);
+
+}
+
+function getSessionInformation() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestBodyObject = new Object();
+  requestBodyObject.sessionID = urlParams.get(session-id);
+  const requestBody = {"sessionID": urlParams.get(session-id)};
+  //contact getServlet from here, given the session ID
+  const getSessionInfoRequest = 
+      new Request('/get-session-info', {method: 'GET', body: requestBody});
+  fetch(getSessionInfoRequest).then(response => response.json()).then(
+    (sessionInfo) => {
+      return sesionInfo;
+    });
+}
+
+function status(text) {
+  document.getElementById('status').textContent = text;
+}
+
+function disconnectedFromServer(e) {
+  status("Reconnecting...");
+  // logic that connects to a repalcement VM
+}
+
+// When this function is called we have
+// successfully connected to a server
+function connectedToServer(e) {
+  status("Connected to session");
 }

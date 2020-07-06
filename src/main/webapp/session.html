@@ -7,13 +7,23 @@
     <script src="script-session.js"></script>
   </head>
   <body>
-    <h1 id="session-title">Virtual Movie Night</h1>
+    <h1 class="center-text">Virtual Movie Night</h1>
+    <div id="status" class="center-text">Loading...</div>
     <div id="session-screen"></div>
-    <img src="list-square-bullet.pn" 
-        id="attendee-list" onclick="openAttendeeContainer()"
-        alt="Once clicked contains information about who is in the session">  <!-- only open if display of attendee-container is none -->
-    <div id="attendee-container">
-      <span id="close" onclick="closeAttendeeContainer()">X</span>
+    <img src="info-circle-line.png" 
+        id="session-info-img" onclick="openSessionInfo()"
+        alt="Once clicked contains information about the session">  <!-- only open if display of attendee-container is none -->
+    <div id="session-info-div">
+      <span id="close" onclick="closeSessionInfo()">X</span>
+      <div id="session-id-div">
+        <label id="session-id-label" for="session-id">Session-ID:
+        </label>
+        <input type="text" id="session-id-field" name="session-id"
+            value="example123" readonly onclick="copyTextToClipboard()">
+      </div>
+      <div id="session-info-attendees">
+        <h2 class="center-text">Attendees</h2>
+      </div>
     </div> <!-- onlick of close just make display none -->
   </body>
 </html>
