@@ -45,11 +45,11 @@ function openAttendeeContainer() {
 }
 
 /**
- * @return the <div> element containing all the elements representing
+ * @return the div element containing all the elements representing
  *    an attendee of the session.
  * @param {string} nameOfAttendee
  */
-function buildAttendeeContainerDiv(nameOfAttendee) {
+function buildAttendeeDiv(nameOfAttendee) {
 
 }
 
