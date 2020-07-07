@@ -45,7 +45,7 @@ function refresh() {
     sessionInformation = sessionInformationPoll.result();
     updateController();
     updateSessionInfoAttendees();
-  }, cadence);
+  }, 30000);
 }
 
 //maybe also have a function outside that setTimesout, getting result
@@ -60,7 +60,7 @@ function remoteToSession() {
   sessionInformation = sessionInformationRequest();
   const url = 'wss://'+sessionInformation.instanceIP+':6080';
   sessionScreen = new RFB(document.getElementById('session-screen'), url,
-                { credentials: { password: 'session-party' } });
+                { credentials: { password: 'sessionparty' } });
   sessionScreen.addEventListener('connect', connectedToServer);
   sessionScreen.addEventListener('disconnect', disconnectedFromServer);
   sessionScreen.addEventListener('credentialsrequired', credentialsAreRequired);
@@ -169,5 +169,5 @@ function disconnectedFromServer(e) {
 // successfully connected to a server
 function connectedToServer(e) {
   document.getElementById('status').display = 'none';
-  // isNotConnected = false;
+  isNotConnected = false;
 }
