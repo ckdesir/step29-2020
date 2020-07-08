@@ -21,7 +21,7 @@ function openSessionInfo() {
 }
 
 /**
- * function closeSessionContainer() closes the div container
+ * function closeSessionInfo() closes the div container
  * that has information about the session.
  */
 function closeSessionInfo() {
@@ -38,3 +38,9 @@ function copyTextToClipboard() {
   document.execCommand('copy');
   alert('Copied the text: ' + sessionIdElement.value);
 }
+
+module.exports = {
+  openSessionInfo: openSessionInfo,
+  closeSessionInfo: closeSessionInfo,
+  copyTextToClipboard: copyTextToClipboard
+};
