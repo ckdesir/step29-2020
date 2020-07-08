@@ -15,6 +15,8 @@
 // RFB holds the API to connect and communicate with a VNC server   
 import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
 
+let sessionCache;
+
 let sessionScreen;
 // Check for inclusion both ways, if attendeeArray has someone but the session info
 // does not, that person has left. If the session info has someone, but the attendee array doesn't,
