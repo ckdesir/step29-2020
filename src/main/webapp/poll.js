@@ -8,7 +8,7 @@
 class Poll {
   /**
    * Operates on an instance of Poll.
-   * @param {function(): ?object} fetchAPIRequest Represents the API request
+   * @param {function(): ?Object} fetchAPIRequest Represents the API request
    *    that is polled.
    * @param {number=} [pollingTime] Represents the cadence at which 
    *    the fetchRequest is called upon. Must be provided in milliseconds
@@ -16,18 +16,14 @@ class Poll {
    * @param {?number=} [maxAttempts] An optional parameter, 
    *    can limit the amount of times polling occurs by the number
    *    of maxAttempts. By default, there is no limit (definited as null).
-   * @param {function(object): boolean} [condition] 
-   *    Represents conditional to check for the fetchAPIRequest when
-   *    polling by condition, by default is always false.
    */
-  constructor(fetchAPIRequest, pollingTime = 30000, maxAttempts = null,
-      condition = () => false) {
+  constructor(fetchAPIRequest, pollingTime = 30000, maxAttempts = null) {
     /** 
      * Represents the output of the fetchRequest function, is constantly
      * being updated. Can be null, ie in the case of if the 
      * fetchAPIRequest is meant to update the server instead of
      * checking for some new result. 
-     * @private {?object} 
+     * @private {?Object} 
      */
     // this.result_
 
@@ -45,39 +41,22 @@ class Poll {
      * @private {number} represents the amount of times polling has occured. 
      */
     // this.attempts_
-
-    /**
-     * @private {function(object): boolean} 
-     */
-    // this.condition_
   }
 
   /**
-   * Uses Promises to poll until a condition is met (where then the
-   * result is returned directly). This method periodically executes 
-   * (time dictated by pollingTime) the given API request from
-   * fetchAPIRequest, updating the result.
+   * This method periodically executes (time dictated by pollingTime)
+   * the given API request from fetchAPIRequest, updating the result.
    */ 
-  async poll() {
-
+  poll() {
+    return;
   }
 
   /**
-   * Returns the current result of the fetchAPIRequest given how
+   * Returns the current result of the fetchAPIRequest given how  
    * updated the poll is.
-   * @return {?object} The result.
+   * @return {?Object} The result.
    */
   getResult() {
-
-  }
-  
-  /**
-   * Allows client to change the condition.
-   * @param {function(object): boolean} condition 
-   *    Represents condition to check for the fetchAPIRequest when
-   *    polling by conditional.
-   */
-  setCondition(condition) {
-
+    return;
   }
 }
