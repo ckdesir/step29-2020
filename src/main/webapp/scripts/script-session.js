@@ -30,7 +30,17 @@ window.onload = function() { main(); }
  * the behind the scenes operations, like polling.
  */
 function main() {
+  //create sessionCache, grab key, remote to session
+  remoteToSession();
   refresh();
+}
+
+/**
+ * function remoteToSession() uses the noVNC library
+ * in order to connect to a session.
+ */
+function remoteToSession() {
+  return;
 }
 
 /**
@@ -40,6 +50,7 @@ function main() {
  */
 function refresh() {
   setTimeout(() => {
+    updateController();
     updateSessionInfoAttendees();
   }, REFRESH_RATE);
 }
@@ -133,6 +144,15 @@ function removeAttendeeDiv(nameOfAttendee) {
  * is revoked and passed on to whoever was clicked.
  */
 function changeController() {
+  return;
+}
+
+/**
+ * function updateController() checks to see if the current user should
+ * be the controller of their party, changing session screen privilege
+ * and updating user interface.
+ */
+function updateController() {
   return;
 }
 
