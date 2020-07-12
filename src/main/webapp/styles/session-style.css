@@ -94,3 +94,9 @@ html {
   text-align: center;
   width: 100%;
 }
+
+#controller-toggle {
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
