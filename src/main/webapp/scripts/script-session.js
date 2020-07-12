@@ -30,7 +30,7 @@ window.onload = function() { main(); }
  * the behind the scenes operations, like polling.
  */
 function main() {
-  //create sessionCache, grab key, remote to session
+  //create sessionCache, grab key (is the value already populated by the time the session remotes?), remote to session
   remoteToSession();
   refresh();
 }
@@ -49,10 +49,9 @@ function remoteToSession() {
  * Checks for new attendees and for whoever the controller is.
  */
 function refresh() {
-  setTimeout(() => {
-    updateController();
-    updateSessionInfoAttendees();
-  }, REFRESH_RATE);
+  updateController();
+  updateSessionInfoAttendees();
+  setTimeout(refresh(), REFRESH_RATE);
 }
 
 /**
