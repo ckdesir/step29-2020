@@ -93,47 +93,62 @@ function updateSessionInfoAttendees() {
 /**
  * function buildAttendeeDiv() adds the div element containing
  * all the elements representing an attendee to the session info
- * attendee div.
+ * attendees div.
  * @param {string} nameOfAttendee
  */
 function buildAttendeeDiv(nameOfAttendee) {
-  const /** HTMLDivElement */ sessionInfoAttendeeDiv =
-      document.getElementById('session-info-attendee');
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
   const /** HTMLDivElement */ attendeeDiv = document.createElement('div');
   const /** HTMLSpanElement */ controllerToggle = 
       document.createElement('span');
-  controllerToggle.id = 'controller-toggle';
+  controllerToggle.className = 'controller-toggle';
   controllerToggle.addEventListener('click', changeController);
   const /** HTMLImageElement */ attendeeIcon =
       document.createElement('img');
   // attendeeIcon.src = 
-  attendeeIcon.id = 'attendee-icon'
+  attendeeIcon.className = 'attendee-icon'
   const /** HTMLHeadingElement */ attendeeName =
       document.createElement('h3');
   attendeeName.innerHTML = nameOfAttendee;
-  attendeeName.id = 'attendee-name'
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = nameOfAttendee;
   attendeeDiv.appendChild(controllerToggle);
   attendeeDiv.appendChild(attendeeIcon);
   attendeeDiv.appendChild(attendeeName);
-  sessionInfoAttendeeDiv.appendChild(attendeeDiv);
+  sessionInfoAttendeesDiv.appendChild(attendeeDiv);
 }
 
 /**
  * function removeAttendeeDiv() removes the div element containing
- * all the elements an attendee from the session info attendee div
+ * all the elements an attendee from the session info attendees div
  * based off the name passed in.
  * @param {string} nameOfAttendee
  */
 function removeAttendeeDiv(nameOfAttendee) {
-  const /** HTMLDivElement */ sessionInfoAttendeeDiv =
-      document.getElementById('session-info-attendee');
-  for (let childNode of sessionInfoAttendeeDiv.childNodes) {
-    const /** ?HTMLHeadingElement */ attendeeName = 
-        childNode.getElementById('attendee-name');
-    if(attendeeName && attendeeName.innerHTML === nameOfAttendee) {
-      sessionInfoAttendeeDiv.removeChild(childNode);
-    }
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
+  const /** Element */ attendeeDivNodeToRemove =
+      sessionInfoAttendeesDiv.querySelector('#'+nameOfAttendee);
+  if(attendeeDivNodeToRemove) {
+    sessionInfoAttendeesDiv.removeChild(attendeeDivNodeToRemove.parentNode);
   }
+  // sessionInfoAttendeesDiv.getElementsByTagName('div');
+
+  // const /** HTMLCollection */ allAttendeeDivs =
+  //     sessionInfoAttendeesDiv.children;
+  // for(let attendeeDivIndex = 0; attendeeDivIndex < 
+  //   allAttendeeDivs.length; attendeeDivIndex++) {
+  //     const individualAttendeeDiv = 
+  //         allAttendeeDivs[attendeeDivIndex].children;
+  //     for(let elementIndex = 0; elementIndex < individualAttendeeDiv.length; elementIndex++) {
+  //       const element = individualAttendeeDiv[elementIndex]
+  //       if(element.id && element.id === 'attendee-name' && element.innerHTML === nameOfAttendee) {
+  //         sessionInfoAttendeesDiv.gg
+  //         console.log('hello');
+  //       }
+  //     }
+  //   }
 }
 
 /**
@@ -156,10 +171,4 @@ function updateController() {
 }
 
 export { openSessionInfo, closeSessionInfo, copyTextToClipboard, 
-    buildAttendeeDiv, removeAttendeeDiv };
-
-//     module.exports = {
-//   openSessionInfo: openSessionInfo,
-//   closeSessionInfo: closeSessionInfo,
-//   copyTextToClipboard: copyTextToClipboard
-// };
+    buildAttendeeDiv, removeAttendeeDiv, changeController };
