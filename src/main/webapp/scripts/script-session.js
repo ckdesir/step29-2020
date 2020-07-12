@@ -129,10 +129,11 @@ function removeAttendeeDiv(nameOfAttendee) {
   const /** HTMLElement */ sessionInfoAttendeesDiv =
       document.getElementById('session-info-attendees');
   const /** Element */ attendeeDivNodeToRemove =
-      sessionInfoAttendeesDiv.querySelector('#'+nameOfAttendee);
+      sessionInfoAttendeesDiv ? sessionInfoAttendeesDiv.querySelector('#'+nameOfAttendee) : null;
   if(attendeeDivNodeToRemove) {
     sessionInfoAttendeesDiv.removeChild(attendeeDivNodeToRemove.parentNode);
   }
+}
   // sessionInfoAttendeesDiv.getElementsByTagName('div');
 
   // const /** HTMLCollection */ allAttendeeDivs =
@@ -149,7 +150,6 @@ function removeAttendeeDiv(nameOfAttendee) {
   //       }
   //     }
   //   }
-}
 
 /**
  * function changeController() updates the server with information
