@@ -51,7 +51,7 @@ function remoteToSession() {
 function refresh() {
   updateController();
   updateSessionInfoAttendees();
-  setTimeout(refresh(), REFRESH_RATE);
+  setTimeout(refresh, REFRESH_RATE);
 }
 
 /**
