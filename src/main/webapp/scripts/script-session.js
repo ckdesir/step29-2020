@@ -155,8 +155,11 @@ function updateController() {
   return;
 }
 
-module.exports = {
-  openSessionInfo: openSessionInfo,
-  closeSessionInfo: closeSessionInfo,
-  copyTextToClipboard: copyTextToClipboard
-};
+export { openSessionInfo, closeSessionInfo, copyTextToClipboard, 
+    buildAttendeeDiv, removeAttendeeDiv };
+
+//     module.exports = {
+//   openSessionInfo: openSessionInfo,
+//   closeSessionInfo: closeSessionInfo,
+//   copyTextToClipboard: copyTextToClipboard
+// };

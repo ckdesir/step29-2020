@@ -1,5 +1,4 @@
-const {openSessionInfo, closeSessionInfo, copyTextToClipboard} =
-    require('./script-session');
+import * as functions from './script-session';
 
 test('display none to block', () => {
   document.body.innerHTML = '<div id="container"></div>';
@@ -10,7 +9,7 @@ test('display none to block', () => {
 
   container.appendChild(div);
 
-  openSessionInfo();
+  functions.openSessionInfo();
 
   expect(div.style.display).toEqual('block');
 });
@@ -24,7 +23,7 @@ test('display block to none', () => {
 
   container.appendChild(div);
 
-  closeSessionInfo();
+  functions.closeSessionInfo();
 
   expect(div.style.display).toEqual('none');
 });
@@ -38,8 +37,8 @@ test('change display using both functions - open then close', () => {
 
   container.appendChild(div);
 
-  openSessionInfo();
-  closeSessionInfo();
+  functions.openSessionInfo();
+  functions.closeSessionInfo();
 
   expect(div.style.display).toEqual('none');
 });
@@ -53,7 +52,7 @@ test('already opened', () => {
 
   container.appendChild(div);
 
-  openSessionInfo();
+  functions.openSessionInfo();
 
   expect(div.style.display).toEqual('block');
 });
@@ -65,7 +64,7 @@ test('tests copy and paste', () => {
   input.id = 'session-id-field';
   input.name = 'session-id';
   input.value = 'hello!';
-  input.addEventListener('click', copyTextToClipboard);
+  input.addEventListener('click', functions.copyTextToClipboard);
 
   container.appendChild(input);
 
