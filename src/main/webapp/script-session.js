@@ -69,6 +69,7 @@ function remoteToSession() {
   sessionScreen.addEventListener('desktopname', updateDesktopName);
   // if(new URLSearchParams(window.location.search).get(name)===sessionInfo.controller) {
   //   rfb.viewOnly = false;
+  //   display div that welcomes and copy paste
   // } else {
   //   rfb.viewOnly = true;
   // }
