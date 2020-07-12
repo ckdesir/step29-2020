@@ -34,8 +34,9 @@ function main() {
 }
 
 /**
- * Refreshes information client side, given how updated the server is with
- * changes. Checks for new attendees and for whoever the controller is.
+ * function refresh() refreshes information client side, 
+ * given how updated the server is with changes. 
+ * Checks for new attendees and for whoever the controller is.
  */
 function refresh() {
   setTimeout(() => {
@@ -71,34 +72,58 @@ function copyTextToClipboard() {
 }
 
 /**
- * Adds new attendees to the session to the session info attendee div.
- * Also removes if they left the session. Alerts users of anyone
- * who has left/entered.
+ * function updateSessionInfoAttendees() adds new attendees to the
+ * session to the session info attendee div. Also removes attendees 
+ * if they left the session. Alerts users of anyone who has left/entered.
  */
 function updateSessionInfoAttendees() {
-  const sessionInfoAttendeeDiv = document.getElementById('session-info-attendee');
+  return;
 }
 
 /**
- * @return {object} the div element containing all the elements representing
- *    an attendee of the session.
+ * function buildAttendeeDiv() adds the div element containing
+ * all the elements representing an attendee to the session info
+ * attendee div.
  * @param {string} nameOfAttendee
  */
 function buildAttendeeDiv(nameOfAttendee) {
+  const /** HTMLDivElement */ sessionInfoAttendeeDiv =
+      document.getElementById('session-info-attendee');
   const /** HTMLDivElement */ attendeeDiv = document.createElement('div');
-  const controllerToggle = document.createElement('span');
+  const /** HTMLSpanElement */ controllerToggle = 
+      document.createElement('span');
   controllerToggle.id = 'controller-toggle';
   controllerToggle.addEventListener('click', changeController);
-  const attendeeIcon = document.createElement('img');
+  const /** HTMLImageElement */ attendeeIcon =
+      document.createElement('img');
   // attendeeIcon.src = 
   attendeeIcon.id = 'attendee-icon'
-  const attendeeName = document.createElement('h3');
+  const /** HTMLHeadingElement */ attendeeName =
+      document.createElement('h3');
   attendeeName.innerHTML = nameOfAttendee;
   attendeeName.id = 'attendee-name'
   attendeeDiv.appendChild(controllerToggle);
   attendeeDiv.appendChild(attendeeIcon);
   attendeeDiv.appendChild(attendeeName);
-  return attendeeDiv;
+  sessionInfoAttendeeDiv.appendChild(attendeeDiv);
+}
+
+/**
+ * function removeAttendeeDiv() removes the div element containing
+ * all the elements an attendee from the session info attendee div
+ * based off the name passed in.
+ * @param {string} nameOfAttendee
+ */
+function removeAttendeeDiv(nameOfAttendee) {
+  const /** HTMLDivElement */ sessionInfoAttendeeDiv =
+      document.getElementById('session-info-attendee');
+  for (let childNode of sessionInfoAttendeeDiv.childNodes) {
+    const /** ?HTMLHeadingElement */ attendeeName = 
+        childNode.getElementById('attendee-name');
+    if(attendeeName && attendeeName.innerHTML === nameOfAttendee) {
+      sessionInfoAttendeeDiv.removeChild(childNode);
+    }
+  }
 }
 
 /**
