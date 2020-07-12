@@ -75,37 +75,65 @@ test('tests copy and paste', () => {
 });
 
 test('adding an attendee div', () => {
+  document.body.innerHTML = '';
+
   const /** HTMLDivElement */ sessionInfoAttendeeDiv =
     document.createElement('div');
   sessionInfoAttendeeDiv.id = 'session-info-attendees';
   document.body.appendChild(sessionInfoAttendeeDiv);
 
-  const /** HTMLDivElement */ attendeeDivExpected =
-      document.createElement('div');
+  const /** HTMLDivElement */ attendeeDivExpected = document.createElement('div');
   const /** HTMLSpanElement */ controllerToggle = 
       document.createElement('span');
-  controllerToggle.id = 'controller-toggle';
+  controllerToggle.className = 'controller-toggle';
   controllerToggle.addEventListener('click', functions.changeController);
   const /** HTMLImageElement */ attendeeIcon =
-      document.createElement('img');
-  // attendeeIcon.src = 
-  attendeeIcon.id = 'attendee-icon'
+      document.createElement('img'); 
+  attendeeIcon.className = 'attendee-icon'
   const /** HTMLHeadingElement */ attendeeName =
       document.createElement('h3');
   attendeeName.innerHTML = 'hello';
-  attendeeName.id = 'attendee-name'
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = 'hello';
   attendeeDivExpected.appendChild(controllerToggle);
   attendeeDivExpected.appendChild(attendeeIcon);
   attendeeDivExpected.appendChild(attendeeName);
 
   functions.buildAttendeeDiv('hello');
 
-  console.log(sessionInfoAttendeeDiv.innerHTML);
-
   expect(sessionInfoAttendeeDiv.childNodes[0]).toEqual(attendeeDivExpected);
 })
 
-test.only('removing an attendee div', () => {
+test('removing an attendee div', () => {
+  document.body.innerHTML = '';
+
+  const /** HTMLDivElement */ sessionInfoAttendeeDiv =
+    document.createElement('div');
+  sessionInfoAttendeeDiv.id = 'session-info-attendees';
+  document.body.appendChild(sessionInfoAttendeeDiv);
+
+  functions.buildAttendeeDiv('hello');
+  functions.removeAttendeeDiv('hello');
+
+  expect(sessionInfoAttendeeDiv.innerHTML).toBeFalsy();
+})
+
+test('removing an attendee div, already empty', () => {
+  document.body.innerHTML = '';
+
+  const /** HTMLDivElement */ sessionInfoAttendeeDiv =
+    document.createElement('div');
+  sessionInfoAttendeeDiv.id = 'session-info-attendees';
+  document.body.appendChild(sessionInfoAttendeeDiv);
+
+  functions.removeAttendeeDiv('hello');
+
+  expect(sessionInfoAttendeeDiv.innerHTML).toBeFalsy();
+})
+
+test('removing a non matching attendee div', () => {
+  document.body.innerHTML = '';
+
   const /** HTMLDivElement */ sessionInfoAttendeeDiv =
     document.createElement('div');
   sessionInfoAttendeeDiv.id = 'session-info-attendees';
@@ -113,6 +141,23 @@ test.only('removing an attendee div', () => {
 
   functions.buildAttendeeDiv('hello');
   functions.removeAttendeeDiv('hell');
-  
-  console.log(sessionInfoAttendeeDiv.innerHTML);
+
+  const /** HTMLDivElement */ attendeeDivExpected = document.createElement('div');
+  const /** HTMLSpanElement */ controllerToggle = 
+      document.createElement('span');
+  controllerToggle.className = 'controller-toggle';
+  controllerToggle.addEventListener('click', functions.changeController);
+  const /** HTMLImageElement */ attendeeIcon =
+      document.createElement('img');
+  attendeeIcon.className = 'attendee-icon'
+  const /** HTMLHeadingElement */ attendeeName =
+      document.createElement('h3');
+  attendeeName.innerHTML = 'hello';
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = 'hello';
+  attendeeDivExpected.appendChild(controllerToggle);
+  attendeeDivExpected.appendChild(attendeeIcon);
+  attendeeDivExpected.appendChild(attendeeName);
+
+  expect(sessionInfoAttendeeDiv.childNodes[0]).toEqual(attendeeDivExpected);
 })

@@ -94,7 +94,7 @@ function updateSessionInfoAttendees() {
  * function buildAttendeeDiv() adds the div element containing
  * all the elements representing an attendee to the session info
  * attendees div.
- * @param {string} nameOfAttendee
+ * @param {string} nameOfAttendee name of attendee to build
  */
 function buildAttendeeDiv(nameOfAttendee) {
   const /** HTMLElement */ sessionInfoAttendeesDiv =
@@ -123,7 +123,7 @@ function buildAttendeeDiv(nameOfAttendee) {
  * function removeAttendeeDiv() removes the div element containing
  * all the elements an attendee from the session info attendees div
  * based off the name passed in.
- * @param {string} nameOfAttendee
+ * @param {string} nameOfAttendee name of attendee to delete
  */
 function removeAttendeeDiv(nameOfAttendee) {
   const /** HTMLElement */ sessionInfoAttendeesDiv =
