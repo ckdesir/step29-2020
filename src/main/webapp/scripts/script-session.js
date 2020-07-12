@@ -39,6 +39,17 @@ function copyTextToClipboard() {
   alert('Copied the text: ' + sessionIdElement.value);
 }
 
+/**
+ * @return {object} the div element containing all the elements representing
+ *    an attendee of the session.
+ * @param {string} nameOfAttendee
+ */
+function buildAttendeeDiv(nameOfAttendee) {
+  const sessionInfoAttendeeDiv = document.getElementById('session-info-attendee');
+  const controllerToggle = document.createElement('span');
+  
+}
+
 module.exports = {
   openSessionInfo: openSessionInfo,
   closeSessionInfo: closeSessionInfo,
