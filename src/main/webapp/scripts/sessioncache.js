@@ -1,3 +1,5 @@
+import { Poller } from "./poller";
+
 /** 
  * SessionCache bridges the gap between the client and server.
  * Allows client to indirectly stay in contact with the server,
@@ -11,7 +13,7 @@
 class SessionCache {
   /**
    * Initalizes a SessionCache object.
-   * @param {Object} urlParams Represents the URLSearchParams of the
+   * @param {Object} urlSearchParams Represents the URLSearchParams of the
    *    session the client is in, holds information such as the
    *    session ID and the screen name of the current user.
    * @param {number=} [refreshCadence = 30000] Represents the cadence at
@@ -24,7 +26,8 @@ class SessionCache {
      * the current session.
      * @private {Object} 
      */
-    this.sessionInformationPoller_ = null;
+    this.sessionInformationPoller_ = 
+        new Poller(this.sessionInformationFetchRequest_);
 
     /**
      * Holds what is being tracked by the SessionCache, the
@@ -39,19 +42,35 @@ class SessionCache {
     this.refreshCadence_ = refreshCadence;
 
     /**
-     * @private {Object}
+     * Represents a resource request for the session
+     * information fetch request.
+     * @private @const {Object}
      */
-    this.urlParams_ = urlParams;
+    this.GET_SESSION_INFO_REQUEST_ = 
+        new Request('/get-session-info', 
+        { 
+          method: 'GET', 
+          body: urlSearchParams 
+        }
+      );
   }
 
   /**
-   * Refreshes the result from the session information poller 
+   * Refreshes (rate dictated by the refreshCadence) 
+   * the result from the session information poller 
    * and updates the sessionInformation field.
-   * Keys are updated every 30 seconds.
    * @private
    */
   refreshSessionInformation_() {
-    throw new Error('Unimplemented');
+    this.sessionInformation_ = 
+        this.sessionInformationPoller_.getLastResult();
+    /**
+     * Represents the handler returned by the setTimeout that refreshes.
+     * @private {number}
+     */
+    this.setTimeoutIdOfRefresh_ = setTimeout(() => {
+      this.refreshSessionInformation_();
+    }, this.refreshCadence_);
   }
 
   /** 
@@ -59,7 +78,8 @@ class SessionCache {
    * refreshing.
    */
   start() {
-    throw new Error('Unimplemented');
+    this.sessionInformationPoller_.start();
+    this.refreshSessionInformation_();
   }
 
   /** 
@@ -67,17 +87,22 @@ class SessionCache {
    * refreshing.
    */
   stop() {
-    throw new Error('Unimplemented');
+    this.sessionInformationPoller_.stop();
+    clearTimeout(this.setTimeoutIdOfRefresh_);
   }
 
   /**
-   * Method sessionInformationRequest_() is the fetch api request
+   * Method sessionInformationFetchRequest_() is the fetch api request
    * responsible for gathering information about the current session 
    * the client is in.
    * @private
    */
-  sessionInformationRequest_() {
-    throw new Error('Unimplemented');
+  sessionInformationFetchRequest_() {
+    fetch(this.GET_SESSION_INFO_REQUEST_).then(response => 
+      response.json()).then((sessionInfo) => {
+        return sesionInfo;
+      }
+    );
   }
 
   /**
@@ -86,7 +111,7 @@ class SessionCache {
    * @return {Object} The Session object.
    */
   getSessionInformation() {
-    throw new Error('Unimplemented');
+    return this.sessionInformation_;
   }
 }
 
