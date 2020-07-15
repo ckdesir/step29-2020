@@ -1,16 +1,32 @@
-// Copyright 2019 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+
+
+/**
+ * function buildAttendeeDiv() adds the div element containing
+ * all the elements representing an attendee to the session info
+ * attendees div.
+ * @param {string} nameOfAttendee name of attendee to build
+ */
+function buildAttendeeDiv(nameOfAttendee) {
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
+  const /** HTMLDivElement */ attendeeDiv = document.createElement('div');
+  const /** HTMLSpanElement */ controllerToggle = 
+      document.createElement('span');
+  controllerToggle.className = 'controller-toggle';
+  controllerToggle.addEventListener('click', changeController);
+  const /** HTMLImageElement */ attendeeIcon =
+      document.createElement('img'); 
+  attendeeIcon.className = 'attendee-icon'
+  const /** HTMLHeadingElement */ attendeeName =
+      document.createElement('h3');
+  attendeeName.innerHTML = nameOfAttendee;
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = nameOfAttendee;
+  attendeeDiv.appendChild(controllerToggle);
+  attendeeDiv.appendChild(attendeeIcon);
+  attendeeDiv.appendChild(attendeeName);
+  sessionInfoAttendeesDiv.appendChild(attendeeDiv);
+}
 
 /**
  * function openSessionInfo() displays the div container
