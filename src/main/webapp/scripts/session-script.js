@@ -1,4 +1,12 @@
 
+/**
+ * function updateSessionInfoAttendees() adds new attendees to the
+ * session to the session info attendee div. Also removes attendees 
+ * if they left the session. Alerts users of anyone who has left/entered.
+ */
+function updateSessionInfoAttendees() {
+  throw new Error('Unimplemented');
+}
 
 /**
  * function buildAttendeeDiv() adds the div element containing
@@ -43,6 +51,25 @@ function removeAttendeeDiv(nameOfAttendee) {
   if(attendeeDivNodeToRemove) {
     sessionInfoAttendeesDiv.removeChild(attendeeDivNodeToRemove.parentNode);
   }
+}
+
+/**
+ * function updateController() checks to see if the current user should
+ * be the controller of their party, changing session screen privilege
+ * and updating user interface.
+ */
+function updateController() {
+  throw new Error('Unimplemented');
+}
+
+/**
+ * function changeController() updates the server with information
+ * about a new possible controller. If the current controller of the 
+ * session clicks on the controller toggle, their controller status
+ * is revoked and passed on to whoever was clicked.
+ */
+function changeController() {
+  throw new Error('Unimplemented');
 }
 
 /**
