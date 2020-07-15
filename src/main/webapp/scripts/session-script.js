@@ -29,6 +29,23 @@ function buildAttendeeDiv(nameOfAttendee) {
 }
 
 /**
+ * function removeAttendeeDiv() removes the div element containing
+ * all the elements an attendee from the session info attendees div
+ * based off the name passed in.
+ * @param {string} nameOfAttendee name of attendee to delete
+ */
+function removeAttendeeDiv(nameOfAttendee) {
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
+  const /** Element */ attendeeDivNodeToRemove =
+      sessionInfoAttendeesDiv ? sessionInfoAttendeesDiv.querySelector(
+          '#'+nameOfAttendee) : null;
+  if(attendeeDivNodeToRemove) {
+    sessionInfoAttendeesDiv.removeChild(attendeeDivNodeToRemove.parentNode);
+  }
+}
+
+/**
  * function openSessionInfo() displays the div container
  * that has information about the session.
  */
