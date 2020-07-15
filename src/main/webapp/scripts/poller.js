@@ -41,17 +41,13 @@
    * @private
    */ 
   poll_() {
-    if(this.maxAttempts_ && this.setTimeoutID_ === this.maxAttempts_) {
-      this.stop();
-      return;
-    } else {
-      this.result_ = this.pollingFunction_();
-    }
+    this.result_ = this.pollingFunction_();
     /**
-     * Represents the handler returned by setTimeout.
+     * Represents the handler returned by the setTimeout that continues
+     * to poll.
      * @private {number}
      */
-    this.setTimeoutID_ = setTimeout(() => {
+    this.setTimeoutIdOfPoll_ = setTimeout(() => {
       this.poll_();
     }, this.pollingPeriod_);
   }
@@ -68,7 +64,7 @@
    * function instance.
    */
   stop() {
-    clearTimeout(this.setTimeoutID_);
+    clearTimeout(this.setTimeoutIdOfPoll_);
   }
 
   /**
@@ -77,19 +73,7 @@
    * @return {?Object} The result.
    */
   getLastResult() {
-    return this.result_
-  }
-
-  /**
-   * Used for testing, limits the number of times the object is polled. 
-   * @param {?number=} maxAttempts limits the amount of times polling 
-   *    occurs by the number of maxAttempts.
-   */
-  testOnlySetMaxPollAttempts(maxAttempts) {
-    /**
-     * @private {number}
-     */
-    this.maxAttempts_ = maxAttempts;
+    return this.result_;
   }
 }
 
