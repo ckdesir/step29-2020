@@ -41,14 +41,26 @@
    * @private
    */ 
   poll_() {
-    throw new Error('Unimplemented');
+    if(this.maxAttempts_ && this.setTimeoutID_ === this.maxAttempts_) {
+      this.stop();
+      return;
+    } else {
+      this.result_ = this.pollingFunction_();
+    }
+    /**
+     * Represents the handler returned by setTimeout.
+     * @private {number}
+     */
+    this.setTimeoutID_ = setTimeout(() => {
+      this.poll_();
+    }, this.pollingPeriod_);
   }
 
   /** 
    * This method begins polling. 
    */
   start() {
-    throw new Error('Unimplemented');
+    this.poll_();
   }
 
   /** 
@@ -56,7 +68,7 @@
    * function instance.
    */
   stop() {
-    throw new Error('Unimplemented');
+    clearTimeout(this.setTimeoutID_);
   }
 
   /**
@@ -65,7 +77,7 @@
    * @return {?Object} The result.
    */
   getLastResult() {
-    throw new Error('Unimplemented');
+    return this.result_
   }
 
   /**

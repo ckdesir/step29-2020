@@ -40,6 +40,14 @@ test.only('Test to see if stop is working correctly!', () => {
   expect(poll.getLastResult()).toBe(true);
 });
 
+test('stopping before starting') {
+
+}
+
+test('starting up again after stopping') {
+  
+}
+
 function pollingFunction() {
   return true;
 }
