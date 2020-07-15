@@ -32,12 +32,6 @@
      */
     this.pollingPeriod_ = pollingPeriod;
 
-    /**
-     * @private {number} represents the amount of times polling has 
-     *    occured. 
-     */
-    this.attempts_ = 0;
-
     this.pollingFunction_ = pollingFunction;
   }
 
