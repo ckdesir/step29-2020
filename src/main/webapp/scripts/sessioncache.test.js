@@ -1,29 +1,63 @@
 import { SessionCache } from './sessioncache';
+import { Poller } from './poller';
 
+//import "isomorphic-fetch";
+//import fetchMock from 'jest-fetch-mock';
+import fetch from 'jest-fetch-mock';
+
+fetch.enableMocks();
+jest.setTimeout(40000);
+
+const pollSpy = jest.spyOn(Poller.prototype, 'poll_');
 const setTimeoutSpy = jest.spyOn(window, 'setTimeout');
 const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');
 const params =  new URLSearchParams('?session-id=EEEE7&name=chris');
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    json: () => Promise.resolve({ key: true }),
-  })
-);
+
+const expected = {
+  sessionID: 'EEEE7',
+  controller: 'chris',
+  listOfAttendes: ['chris']
+};
+
+// global.fetch = jest.fn(() =>
+//   Promise.resolve({
+//     json: () => Promise.resolve(expected),
+//   })
+// );
+
+// jest.spyOn(window, "fetch").mockImplementation(() => {
+//   const fetchResponse = {
+//     json: () => Promise.resolve(expected)
+//   };
+//   return Promise.resolve(fetchResponse);
+// });
 
 afterEach(() => {    
   jest.clearAllMocks();
+  fetch.resetMocks();
 });
 
+// beforeEach(() => {
+//   fetchMock.mock('https://randomuser.me/api/?results=10', req => {
+//     return expected;
+//   })
+// });
+
 test.only('Test to see if stop is working correctly!', (done) => {
-  const cache = new SessionCache(params);
+  fetch.mockResponse(JSON.stringify(expected));
+
+  const cache = new SessionCache(params, 1000, 1000);
   cache.start();
+
   setTimeout(() => {
     cache.stop();
-    expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
-    expect(setTimeoutSpy.mock.length).toBeGreaterThan(8);
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(cache.getSessionInformation()).toBeTruthy();    
+    // expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+    // expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(40);
+    // expect(pollSpy.mock.calls.length).toBeGreaterThan(20);
+    cache.getSessionInformation().then((val) => console.log(val));
+    //console.log(cache.getSessionInformation().then());  
     done();
-  }, 10000);
+  }, 2000);
 });
 
 test('We can check if poll() is called correct amount' + 

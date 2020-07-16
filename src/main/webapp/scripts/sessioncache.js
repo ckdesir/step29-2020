@@ -18,16 +18,19 @@ class SessionCache {
    *    session ID and the screen name of the current user.
    * @param {number=} [refreshCadence = 30000] Represents the cadence at
    *    which the sessionInformation is refreshed. By default, the rate is 
-   *    30,000 milliseconds (or 30 seconds).  
+   *    30,000 milliseconds (or 30 seconds). 
+   * @param {number=} [pollingCadence = 30000] Represents the 
+   *    cadence at which the server is polled. By default, the rate is 
+   *    30,000 milliseconds (or 30 seconds).   
    */
-  constructor(urlParams, refreshCadence = 30000) {
+  constructor(urlSearchParams, refreshCadence = 30000, pollingCadence = 30000) {
     /** 
      * Poller responsible for contacting the server for information about
      * the current session.
      * @private {Object} 
      */
     this.sessionInformationPoller_ = 
-        new Poller(this.sessionInformationFetchRequest_);
+        new Poller(this.sessionInformationFetchRequest_, pollingCadence);
 
     /**
      * Holds what is being tracked by the SessionCache, the
@@ -41,18 +44,7 @@ class SessionCache {
      */
     this.refreshCadence_ = refreshCadence;
 
-    /**
-     * Represents a resource request for the session
-     * information fetch request.
-     * @private @const {Object}
-     */
-    this.GET_SESSION_INFO_REQUEST_ = 
-        new Request('/get-session-info', 
-        { 
-          method: 'GET', 
-          body: urlSearchParams 
-        }
-      );
+    this.urlSearchParams_ = urlSearchParams;
   }
 
   /**
@@ -97,12 +89,10 @@ class SessionCache {
    * the client is in.
    * @private
    */
-  sessionInformationFetchRequest_() {
-    fetch(this.GET_SESSION_INFO_REQUEST_).then(response => 
-      response.json()).then((sessionInfo) => {
-        return sesionInfo;
-      }
-    );
+  async sessionInformationFetchRequest_() {
+    const response = await fetch('https://api.exchangeratesapi.io/latest?base=USD');
+    const sessionInfo = await response.json();
+    return JSON.stringify(sessionInfo);
   }
 
   /**
