@@ -41,6 +41,15 @@ function refresh() {
 }
 
 /**
+ * function updateController() checks to see if the current user should
+ * be the controller of their party, changing session screen privilege
+ * and updating user interface.
+ */
+function updateController() {
+  throw new Error('Unimplemented');
+}
+
+/**
  * function updateSessionInfoAttendees() adds new attendees to the
  * session to the session info attendee div. Also removes attendees 
  * if they left the session. Alerts users of anyone who has left/entered.
@@ -92,15 +101,6 @@ function removeAttendeeDiv(nameOfAttendee) {
   if(attendeeDivNodeToRemove) {
     sessionInfoAttendeesDiv.removeChild(attendeeDivNodeToRemove.parentNode);
   }
-}
-
-/**
- * function updateController() checks to see if the current user should
- * be the controller of their party, changing session screen privilege
- * and updating user interface.
- */
-function updateController() {
-  throw new Error('Unimplemented');
 }
 
 /**
