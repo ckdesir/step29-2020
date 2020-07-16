@@ -5,8 +5,7 @@
  * 
  * SessionCache looks for information about the current session and
  * updates the server with information about each client in return (like
- * date last contacted). Also includes some additional functionality, 
- * like contacting the server to update the controller of the session.
+ * date last contacted).
  */
 class SessionCache {
   /**

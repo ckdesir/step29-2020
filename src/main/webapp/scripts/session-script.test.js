@@ -1,5 +1,4 @@
-const {openSessionInfo, closeSessionInfo, copyTextToClipboard} =
-    require('./session-script');
+import * as functions from './session-script';
 
 test('display none to block', () => {
   document.body.innerHTML = '<div id="container"></div>';
@@ -10,7 +9,7 @@ test('display none to block', () => {
 
   container.appendChild(div);
 
-  openSessionInfo();
+  functions.openSessionInfo();
 
   expect(div.style.display).toEqual('block');
 });
@@ -24,7 +23,7 @@ test('display block to none', () => {
 
   container.appendChild(div);
 
-  closeSessionInfo();
+  functions.closeSessionInfo();
 
   expect(div.style.display).toEqual('none');
 });
@@ -38,8 +37,8 @@ test('change display using both functions - open then close', () => {
 
   container.appendChild(div);
 
-  openSessionInfo();
-  closeSessionInfo();
+  functions.openSessionInfo();
+  functions.closeSessionInfo();
 
   expect(div.style.display).toEqual('none');
 });
@@ -53,7 +52,7 @@ test('already opened', () => {
 
   container.appendChild(div);
 
-  openSessionInfo();
+  functions.openSessionInfo();
 
   expect(div.style.display).toEqual('block');
 });
@@ -65,7 +64,7 @@ test('tests copy and paste', () => {
   input.id = 'session-id-field';
   input.name = 'session-id';
   input.value = 'hello!';
-  input.addEventListener('click', copyTextToClipboard);
+  input.addEventListener('click', functions.copyTextToClipboard);
 
   container.appendChild(input);
 
@@ -73,4 +72,137 @@ test('tests copy and paste', () => {
   input.click();
 
   expect(document.execCommand).toHaveBeenCalledWith('copy');
+});
+
+test('adding an attendee div', () => {
+  document.body.innerHTML = '';
+
+  const sessionInfoAttendeeDiv =
+    document.createElement('div');
+  sessionInfoAttendeeDiv.id = 'session-info-attendees';
+  document.body.appendChild(sessionInfoAttendeeDiv);
+
+  const attendeeDivExpected = document.createElement('div');
+  const controllerToggle = 
+      document.createElement('span');
+  controllerToggle.className = 'controller-toggle';
+  controllerToggle.addEventListener('click', functions.changeController);
+  const attendeeIcon =
+      document.createElement('img'); 
+  attendeeIcon.className = 'attendee-icon'
+  const attendeeName =
+      document.createElement('h3');
+  attendeeName.innerHTML = 'hello';
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = 'hello';
+  attendeeDivExpected.appendChild(controllerToggle);
+  attendeeDivExpected.appendChild(attendeeIcon);
+  attendeeDivExpected.appendChild(attendeeName);
+
+  functions.buildAttendeeDiv('hello');
+
+  expect(sessionInfoAttendeeDiv.childNodes[0]).
+      toEqual(attendeeDivExpected);
+})
+
+test('removing an attendee div', () => {
+  document.body.innerHTML = '';
+
+  const sessionInfoAttendeeDiv =
+    document.createElement('div');
+  sessionInfoAttendeeDiv.id = 'session-info-attendees';
+  document.body.appendChild(sessionInfoAttendeeDiv);
+
+  functions.buildAttendeeDiv('hello');
+  functions.removeAttendeeDiv('hello');
+
+  expect(sessionInfoAttendeeDiv.innerHTML).toBeFalsy();
+})
+
+test('removing an attendee div, already empty', () => {
+  document.body.innerHTML = '';
+
+  const sessionInfoAttendeeDiv =
+    document.createElement('div');
+  sessionInfoAttendeeDiv.id = 'session-info-attendees';
+  document.body.appendChild(sessionInfoAttendeeDiv);
+
+  functions.removeAttendeeDiv('hello');
+
+  expect(sessionInfoAttendeeDiv.innerHTML).toBeFalsy();
+})
+
+test('removing a non matching attendee div', () => {
+  document.body.innerHTML = '';
+
+  const sessionInfoAttendeeDiv =
+    document.createElement('div');
+  sessionInfoAttendeeDiv.id = 'session-info-attendees';
+  document.body.appendChild(sessionInfoAttendeeDiv);
+
+  functions.buildAttendeeDiv('hello');
+  functions.removeAttendeeDiv('hell');
+
+  const attendeeDivExpected = document.createElement('div');
+  const controllerToggle = 
+      document.createElement('span');
+  controllerToggle.className = 'controller-toggle';
+  controllerToggle.addEventListener('click', functions.changeController);
+  const attendeeIcon =
+      document.createElement('img');
+  attendeeIcon.className = 'attendee-icon'
+  const attendeeName =
+      document.createElement('h3');
+  attendeeName.innerHTML = 'hello';
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = 'hello';
+  attendeeDivExpected.appendChild(controllerToggle);
+  attendeeDivExpected.appendChild(attendeeIcon);
+  attendeeDivExpected.appendChild(attendeeName);
+
+  expect(sessionInfoAttendeeDiv.childNodes[0]).
+      toEqual(attendeeDivExpected);
+})
+
+test('We can check if correct errors are thrown -refresh', () => {
+  try {
+    functions.refresh();
+  } catch (e) {
+    expect(e.message).toBe('Unimplemented');
+  }
+});
+
+test('We can check if correct errors are thrown -remoteToSession', () => {
+  try {
+    functions.remoteToSession();
+  } catch (e) {
+    expect(e.message).toBe('Unimplemented');
+  }
+});
+
+test('We can check if correct errors are thrown' + 
+    '-updateSessionInfoAttendees', () => {
+      try {
+        functions.updateSessionInfoAttendees();
+      } catch (e) {
+        expect(e.message).toBe('Unimplemented');
+      }
+});
+
+test('We can check if correct errors are thrown' + 
+    '-updateController', () => {
+      try {
+        functions.updateController();
+      } catch (e) {
+        expect(e.message).toBe('Unimplemented');
+      }
+});
+
+test('We can check if correct errors are thrown' + 
+    '-changeController', () => {
+      try {
+        functions.changeController();
+      } catch (e) {
+        expect(e.message).toBe('Unimplemented');
+      }
 });

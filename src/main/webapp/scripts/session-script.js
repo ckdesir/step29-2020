@@ -1,5 +1,6 @@
 /**
- * Represents (in miliseconds) the cadence at which the client is refreshed. 
+ * Represents (in miliseconds) the cadence at which the client is 
+ * refreshed. 
  * @type {number}
  */
 const REFRESH_CADENCE = 30000;
@@ -37,7 +38,7 @@ function refresh() {
   updateSessionInfoAttendees();
   setTimeout(() => {
     refresh();
-  }, REFRESH_RATE);
+  }, REFRESH_CADENCE);
 }
 
 /**
@@ -95,11 +96,13 @@ function buildAttendeeDiv(nameOfAttendee) {
 function removeAttendeeDiv(nameOfAttendee) {
   const /** HTMLElement */ sessionInfoAttendeesDiv =
       document.getElementById('session-info-attendees');
+  // Looks for any element that has an id of the name of the attendee
   const /** Element */ attendeeDivNodeToRemove =
       sessionInfoAttendeesDiv ? sessionInfoAttendeesDiv.querySelector(
           '#'+nameOfAttendee) : null;
   if(attendeeDivNodeToRemove) {
-    sessionInfoAttendeesDiv.removeChild(attendeeDivNodeToRemove.parentNode);
+    sessionInfoAttendeesDiv.removeChild(
+        attendeeDivNodeToRemove.parentNode);
   }
 }
 
@@ -141,4 +144,6 @@ function copyTextToClipboard() {
 }
 
 export { openSessionInfo, closeSessionInfo, copyTextToClipboard, 
-  buildAttendeeDiv, removeAttendeeDiv, changeController };
+  buildAttendeeDiv, removeAttendeeDiv, changeController, 
+  updateController, updateSessionInfoAttendees, 
+  refresh, remoteToSession };
