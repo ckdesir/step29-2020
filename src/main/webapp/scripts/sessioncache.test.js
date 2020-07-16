@@ -16,34 +16,15 @@ const params =  new URLSearchParams('?session-id=EEEE7&name=chris');
 const expected = {
   sessionID: 'EEEE7',
   controller: 'chris',
-  listOfAttendes: ['chris']
+  listOfAttendes: ['chris', 'bryan']
 };
-
-// global.fetch = jest.fn(() =>
-//   Promise.resolve({
-//     json: () => Promise.resolve(expected),
-//   })
-// );
-
-// jest.spyOn(window, "fetch").mockImplementation(() => {
-//   const fetchResponse = {
-//     json: () => Promise.resolve(expected)
-//   };
-//   return Promise.resolve(fetchResponse);
-// });
 
 afterEach(() => {    
   jest.clearAllMocks();
   fetch.resetMocks();
 });
 
-// beforeEach(() => {
-//   fetchMock.mock('https://randomuser.me/api/?results=10', req => {
-//     return expected;
-//   })
-// });
-
-test.only('Test to see if stop is working correctly!', (done) => {
+test('Test to see if stop is working correctly!', (done) => {
   fetch.mockResponse(JSON.stringify(expected));
 
   const cache = new SessionCache(params, 1000, 1000);
@@ -51,61 +32,62 @@ test.only('Test to see if stop is working correctly!', (done) => {
 
   setTimeout(() => {
     cache.stop();
-    // expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
-    // expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(40);
-    // expect(pollSpy.mock.calls.length).toBeGreaterThan(20);
-    cache.getSessionInformation().then((val) => console.log(val));
-    //console.log(cache.getSessionInformation().then());  
+    expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+    expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(40);
+    expect(pollSpy.mock.calls.length).toBeGreaterThan(20);
+    expect(cache.getSessionInformation()).toEqual(expected);
     done();
-  }, 2000);
+  }, 30000);
 });
 
 test('We can check if poll() is called correct amount' + 
     'of times + correct return value', (done) => {
-      const poll = new Poller(pollingFunction, 1000);
-      poll.start();
+      fetch.mockResponse(JSON.stringify(expected));
+
+      const cache = new SessionCache(params, 1000, 1000);
+      cache.start();
+
       setTimeout(() => {
         expect(clearTimeoutSpy).toHaveBeenCalledTimes(0);
-        expect(setTimeoutSpy).toHaveBeenCalledTimes(6);
-        expect(pollSpy).toHaveBeenCalledTimes(5);
-        expect(poll.getLastResult()).toBe(true);    
+        expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(10);
+        expect(pollSpy.mock.calls.length).toBeGreaterThanOrEqual(5);
+        expect(cache.getSessionInformation()).toEqual(expected);
         done();
       }, 5000);
 });
 
 test('stopping before starting', () => {
-  const poll = new Poller(pollingFunction, 1000);
-  poll.stop();
-  expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
+  fetch.mockResponse(JSON.stringify(expected));
+  const cache = new SessionCache(params, 1000, 1000);
+  cache.stop();
+  expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
   expect(pollSpy).toHaveBeenCalledTimes(0);
   expect(setTimeoutSpy).toHaveBeenCalledTimes(0);
-  expect(poll.getLastResult()).toBeFalsy();
+  expect(cache.getSessionInformation()).toBeFalsy();
 });
 
 test('starting up, immediately stopping', () => {
-  const poll = new Poller(pollingFunction, 1000);
-  poll.start();
-  poll.stop();
-  expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
+  fetch.mockResponse(JSON.stringify(expected));
+  const cache = new SessionCache(params, 1000, 1000);
+  cache.start();
+  cache.stop();
+  expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
   expect(pollSpy).toHaveBeenCalledTimes(1);
   expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
-  expect(poll.getLastResult()).toBeTruthy();
+  expect(cache.getSessionInformation()).toBeFalsy();
 });
 
 test('starting up after stopping', (done) => {
-  const poll = new Poller(pollingFunction, 1000);
-  poll.start();
-  poll.stop();
-  poll.start();
+  fetch.mockResponse(JSON.stringify(expected));
+  const cache = new SessionCache(params, 1000, 1000);
+  cache.start();
+  cache.stop();
+  cache.start();
   setTimeout(() => {
-    expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
-    expect(setTimeoutSpy.mock.calls.length).toBeGreaterThanOrEqual(6);
-    expect(pollSpy.mock.calls.length).toBeGreaterThanOrEqual(5);
-    expect(poll.getLastResult()).toBe(true);    
+    expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+    expect(setTimeoutSpy.mock.calls.length).toBeGreaterThanOrEqual(12);
+    expect(pollSpy.mock.calls.length).toBeGreaterThanOrEqual(10);
+    expect(cache.getSessionInformation()).toEqual(expected);   
     done();
   }, 5000);
 });
-
-function pollingFunction() {
-  return true;
-}

@@ -1,4 +1,5 @@
 import { Poller } from "./poller";
+import { Session } from "./session";
 
 /** 
  * SessionCache bridges the gap between the client and server.
@@ -53,9 +54,12 @@ class SessionCache {
    * and updates the sessionInformation field.
    * @private
    */
-  refreshSessionInformation_() {
+  async refreshSessionInformation_() {
     this.sessionInformation_ = 
-        this.sessionInformationPoller_.getLastResult();
+        await this.sessionInformationPoller_.getLastResult().then(
+            result => {
+              return result;
+            });
     /**
      * Represents the handler returned by the setTimeout that refreshes.
      * @private {number}
@@ -92,7 +96,7 @@ class SessionCache {
   async sessionInformationFetchRequest_() {
     const response = await fetch('https://api.exchangeratesapi.io/latest?base=USD');
     const sessionInfo = await response.json();
-    return JSON.stringify(sessionInfo);
+    return sessionInfo;
   }
 
   /**
@@ -101,7 +105,7 @@ class SessionCache {
    * @return {Object} The Session object.
    */
   getSessionInformation() {
-    return this.sessionInformation_;
+    return new Session(this.sessionInformation_);
   }
 }
 
