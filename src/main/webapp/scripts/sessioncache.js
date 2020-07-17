@@ -1,5 +1,4 @@
 import { Poller } from "./poller";
-import { Session } from "./session";
 
 /** 
  * SessionCache bridges the gap between the client and server.
@@ -105,7 +104,7 @@ class SessionCache {
    * @return {Object} The Session object.
    */
   getSessionInformation() {
-    return new Session(this.sessionInformation_);
+    return this.sessionInformation_;
   }
 }
 

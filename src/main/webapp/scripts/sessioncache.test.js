@@ -91,3 +91,15 @@ test('starting up after stopping', (done) => {
     done();
   }, 5000);
 });
+
+test.only('Test to see if', (done) => {
+  fetch.mockResponse(JSON.stringify(expected));
+
+  const cache = new SessionCache(params, 1000, 1000);
+  cache.start();
+
+  setTimeout(() => {
+    expect(cache.getSessionInformation()).toEqual(expected);
+    done();
+  }, .1);
+});
