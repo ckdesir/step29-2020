@@ -28,7 +28,10 @@ function main() {
   sessionCache =
       new SessionCache(new URLSearchParams(window.location.search));
   sessionCache.start();
-  remoteToSession();
+  setTimeout(() => {
+    sessionCache.getSessionInformation();
+    remoteToSession(sessionInformation.getIpOfVM());
+  }, 5000);
   refresh();
 }
 
