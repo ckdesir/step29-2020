@@ -1,3 +1,6 @@
+// RFB holds the API to connect and communicate with a VNC server   
+import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
+
 /**
  * Represents (in miliseconds) the cadence at which the client is 
  * refreshed. 
