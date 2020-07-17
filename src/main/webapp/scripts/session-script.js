@@ -10,8 +10,24 @@ import { SessionCache } from '../scripts/sessioncache';
  */
 const REFRESH_CADENCE = 30000;
 
+/**
+ * Represents a cache of the session, keeps in contact with server for 
+ * information about the current session.
+ * @type {Object}
+ */
 let sessionCache;
+
+/**
+ * Represents information about the current session, a Session object.
+ * @type {Object}
+ */
 let sessionInformation;
+
+/**
+ * Represents the noVNC client object; the single connection to the 
+ * VNC server.
+ * @type {Object}
+ */
 let sessionScreen;
 
 /**
@@ -38,10 +54,10 @@ function main() {
 /**
  * function remoteToSession() uses the noVNC library
  * in order to connect to a session.
+ * @param {string} ipOfVM
  */
-function remoteToSession() {
-  sessionInformation = sessionCache.getSessionInformation();
-  const url = 'wss://'+sessionInformation.getIpOfVM()+':6080';
+function remoteToSession(ipOfVM) {
+  const url = 'wss://'+ipOfVM+':6080';
   sessionScreen = new RFB(document.getElementById('session-screen'), url,
       { credentials: { password: 'sessionparty' } });
   sessionScreen.addEventListener('connect', connectedToServer);
@@ -64,6 +80,15 @@ function refresh() {
 }
 
 /**
+ * function updateSessionInfoAttendees() adds new attendees to the
+ * session to the session info attendee div. Also removes attendees 
+ * if they left the session. Alerts users of anyone who has left/entered.
+ */
+function updateSessionInfoAttendees() {
+  throw new Error('Unimplemented');
+}
+
+/**
  * function updateController() checks to see if the current user should
  * be the controller of their party, changing session screen privilege
  * and updating user interface.
@@ -78,19 +103,12 @@ function updateController() {
       sessionScreen.viewOnly = false;
     }
   Array.prototype.forEach.call(controllerToggleList, function(element) {
-    element.classList.add('non-controller');
+    //element.classList.add('non-controller');
     //element.style.color = '#FFF';
   });
+  // sessionInfoAttendeesDiv.querySelector(
+  //   '#'+sessionInformation.getScreenNameOfController()).parentElement.querySelector('span').style.color
   // change ui for controller span
-}
-
-/**
- * function updateSessionInfoAttendees() adds new attendees to the
- * session to the session info attendee div. Also removes attendees 
- * if they left the session. Alerts users of anyone who has left/entered.
- */
-function updateSessionInfoAttendees() {
-  throw new Error('Unimplemented');
 }
 
 /**
