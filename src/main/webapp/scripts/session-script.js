@@ -1,12 +1,18 @@
 // RFB holds the API to connect and communicate with a VNC server   
 import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
 
+import { SessionCache } from '../scripts/sessioncache';
+
 /**
  * Represents (in miliseconds) the cadence at which the client is 
  * refreshed. 
  * @type {number}
  */
 const REFRESH_CADENCE = 30000;
+
+let sessionCache;
+let sessionInformation;
+let sessionScreen;
 
 /**
  * This waits until the webpage loads and then it calls the
@@ -19,6 +25,9 @@ window.onload = function() { main(); }
  * the behind the scenes operations, like caching.
  */
 function main() {
+  sessionCache =
+      new SessionCache(new URLSearchParams(window.location.search));
+  sessionCache.start();
   remoteToSession();
   refresh();
 }
@@ -28,7 +37,13 @@ function main() {
  * in order to connect to a session.
  */
 function remoteToSession() {
-  throw new Error('Unimplemented');
+  sessionInformation = sessionCache.getSessionInformation();
+  const url = 'wss://'+sessionInformation.getIpOfVM()+':6080';
+  sessionScreen = new RFB(document.getElementById('session-screen'), url,
+      { credentials: { password: 'sessionparty' } });
+  sessionScreen.addEventListener('connect', connectedToServer);
+  sessionScreen.addEventListener('disconnect', disconnectedFromServer);
+  sessionScreen.viewOnly = true;
 }
 
 /**
@@ -37,8 +52,9 @@ function remoteToSession() {
  * Checks for new attendees and for whoever the controller is.
  */
 function refresh() {
-  updateController();
+  sessionInformation = sessionCache.getSessionInformation();
   updateSessionInfoAttendees();
+  updateController();
   setTimeout(() => {
     refresh();
   }, REFRESH_CADENCE);
@@ -50,7 +66,19 @@ function refresh() {
  * and updating user interface.
  */
 function updateController() {
-  throw new Error('Unimplemented');
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
+  const /** NodeListOf<HTMLSpanElement> */ controllerToggleList = 
+      sessionInfoAttendeesDiv.querySelectorAll('span');
+  if (new URLSearchParams(window.location.search).get('name') === 
+    sessionInformation.getScreenNameOfController()) {
+      sessionScreen.viewOnly = false;
+    }
+  Array.prototype.forEach.call(controllerToggleList, function(element) {
+    element.classList.add('non-controller');
+    //element.style.color = '#FFF';
+  });
+  // change ui for controller span
 }
 
 /**
@@ -103,7 +131,7 @@ function removeAttendeeDiv(nameOfAttendee) {
   const /** Element */ attendeeDivNodeToRemove =
       sessionInfoAttendeesDiv ? sessionInfoAttendeesDiv.querySelector(
           '#'+nameOfAttendee) : null;
-  if(attendeeDivNodeToRemove) {
+  if (attendeeDivNodeToRemove) {
     sessionInfoAttendeesDiv.removeChild(
         attendeeDivNodeToRemove.parentNode);
   }
