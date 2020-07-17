@@ -30,6 +30,8 @@ let sessionInformation;
  */
 let sessionScreen;
 
+const urlParameters = new URLSearchParams(window.location.search);
+
 /**
  * This waits until the webpage loads and then it calls the
  * anonymous function, which calls main.
@@ -42,7 +44,7 @@ window.onload = function() { main(); }
  */
 function main() {
   sessionCache =
-      new SessionCache(new URLSearchParams(window.location.search));
+      new SessionCache(urlParameters);
   sessionCache.start();
   setTimeout(() => {
     sessionCache.getSessionInformation();
@@ -98,7 +100,7 @@ function updateController() {
       document.getElementById('session-info-attendees');
   const /** NodeListOf<HTMLSpanElement> */ controllerToggleList = 
       sessionInfoAttendeesDiv.querySelectorAll('span');
-  if (new URLSearchParams(window.location.search).get('name') === 
+  if (urlParameters.get('name') === 
     sessionInformation.getScreenNameOfController()) {
       sessionScreen.viewOnly = false;
     }
@@ -124,7 +126,7 @@ function buildAttendeeDiv(nameOfAttendee) {
   const /** HTMLSpanElement */ controllerToggle = 
       document.createElement('span');
   controllerToggle.className = 'controller-toggle';
-  controllerToggle.addEventListener('click', changeController);
+  controllerToggle.addEventListener('click', changeController, /**AddEventListenerOptions=*/ false);
   const /** HTMLImageElement */ attendeeIcon =
       document.createElement('img'); 
   attendeeIcon.className = 'attendee-icon'
@@ -159,13 +161,16 @@ function removeAttendeeDiv(nameOfAttendee) {
 }
 
 /**
- * function changeController() updates the server with information
- * about a new possible controller. If the current controller of the 
- * session clicks on the controller toggle, their controller status
- * is revoked and passed on to whoever was clicked.
+ * If the current controller of the session clicks on the controller 
+ * toggle, their controller status is revoked and the server is updated
+ * with information on the new controller.
  */
-function changeController() {
-  throw new Error('Unimplemented');
+function changeController(event) {
+  if (urlParameters.get('name') === 
+    sessionInformation.getScreenNameOfController()) {
+      sessionScreen.viewOnly = true;
+      //fetch call to change
+    }
 }
 
 /**
