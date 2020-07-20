@@ -46,14 +46,10 @@ function main() {
   sessionCache =
       new SessionCache(urlParameters);
   sessionCache.start();
-  sessionCache.getSessionInformation().then(sesionObject => {
-    sessionInformation = sesionObject;
+  sessionCache.getSessionInformation().then(sessionObject => {
+    sessionInformation = sessionObject;
   });
   remoteToSession(sessionInformation.getIpOfVM());
-  // setTimeout(() => {
-  //   sessionCache.getSessionInformation();
-  //   remoteToSession(sessionInformation.getIpOfVM());
-  // }, 5000);
   refresh();
 }
 
@@ -77,8 +73,8 @@ function remoteToSession(ipOfVM) {
  * Checks for new attendees and for whoever the controller is.
  */
 function refresh() {
-  sessionCache.getSessionInformation().then(sesionObject => {
-    sessionInformation = sesionObject;
+  sessionCache.getSessionInformation().then(sessionObject => {
+    sessionInformation = sessionObject;
   });
   updateSessionInfoAttendees();
   updateController();
