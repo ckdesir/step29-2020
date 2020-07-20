@@ -30,6 +30,12 @@ let sessionInformation;
  */
 let sessionScreen;
 
+/**
+ * Represents the URLSearchParams of the
+ * the client is in, holds information such as the
+ * session ID and the screen name of the current user.
+ * @type {Object}
+ */
 const urlParameters = new URLSearchParams(window.location.search);
 
 /**
@@ -106,13 +112,14 @@ function updateController() {
     sessionInformation.getScreenNameOfController()) {
       sessionScreen.viewOnly = false;
     }
-  Array.prototype.forEach.call(controllerToggleList, function(element) {
-    //element.classList.add('non-controller');
-    //element.style.color = '#FFF';
+  controllerToggleList.forEach(function(individualSpanElement) {
+    individualSpanElement.style.color = '#fff';
   });
+
+  sessionInfoAttendeesDiv.querySelector(`#${sessionInformation.getScreenNameOfController()}`).parentElement.querySelector('span').style.color = '#fd5d00';
+  // change ui for controller span
   // sessionInfoAttendeesDiv.querySelector(
   //   '#'+sessionInformation.getScreenNameOfController()).parentElement.querySelector('span').style.color
-  // change ui for controller span
 }
 
 /**
@@ -128,7 +135,8 @@ function buildAttendeeDiv(nameOfAttendee) {
   const /** HTMLSpanElement */ controllerToggle = 
       document.createElement('span');
   controllerToggle.className = 'controller-toggle';
-  controllerToggle.addEventListener('click', changeController, /**AddEventListenerOptions=*/ false);
+  controllerToggle.addEventListener('click', 
+      changeController, /**AddEventListenerOptions=*/ false);
   const /** HTMLImageElement */ attendeeIcon =
       document.createElement('img'); 
   attendeeIcon.className = 'attendee-icon'
@@ -171,7 +179,7 @@ function changeController(event) {
   if (urlParameters.get('name') === 
     sessionInformation.getScreenNameOfController()) {
       sessionScreen.viewOnly = true;
-      //fetch call to change
+      // fetch call to change
     }
 }
 
@@ -200,6 +208,14 @@ function copyTextToClipboard() {
       document.getElementById('session-id-field');
   sessionIdElement.select();
   document.execCommand('copy');
+}
+
+function connectedToServer() {
+  throw new Error('Unimplemented');
+}
+
+function disconnectedFromServer() {
+  throw new Error('Unimplemented');
 }
 
 export { openSessionInfo, closeSessionInfo, copyTextToClipboard, 
