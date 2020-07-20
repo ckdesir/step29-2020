@@ -6,9 +6,7 @@ import { Session } from './session';
  * Allows client to indirectly stay in contact with the server,
  * encapsulating many of the contact points away from the client.
  * 
- * SessionCache looks for information about the current session and
- * updates the server with information about each client in return (like
- * date last contacted).
+ * SessionCache looks for information about the current session.
  */
 class SessionCache {
   /**
@@ -21,14 +19,6 @@ class SessionCache {
    *    30,000 milliseconds (or 30 seconds).  
    */
   constructor(urlParams, refreshCadence = 30000) {
-    /** 
-     * Poller responsible for contacting the server for information about
-     * the current session.
-     * @private {Object} 
-     */
-    this.sessionInformationPoller_ = 
-        new Poller(this.sessionInformationRequest_, refreshCadence);
-
     /**
      * Holds what is being tracked by the SessionCache, the
      * information about the session.
@@ -40,6 +30,28 @@ class SessionCache {
      * @private {Object}
      */
     this.urlParams_ = urlParams;
+
+    /**
+     * function sessionInformationRequest_() is the fetch api request
+     * responsible for gathering information about the current session.
+     * @private
+     */
+    async function sessionInformationRequest_() {
+      const /** string */ name = encodeURI(this.urlParams_.get('name'));
+      const /** string */ sessionID = 
+          encodeURI(this.urlParams_.get('session-id'));
+      const /** Object */ response = await fetch(
+          `/get-session-info?name=${name}&session-id=${sessionID}`);
+      return await response.json();
+    }
+
+    /** 
+     * Poller responsible for contacting the server for information about
+     * the current session.
+     * @private {Object} 
+     */
+    this.sessionInformationPoller_ = 
+        new Poller(sessionInformationRequest_, refreshCadence);
   }
 
   /** 
@@ -54,20 +66,6 @@ class SessionCache {
    */
   stop() {
     this.sessionInformationPoller_.stop();
-  }
-
-  /**
-   * Method sessionInformationRequest_() is the fetch api request
-   * responsible for gathering information about the current session.
-   * @private
-   */
-  async sessionInformationRequest_() {
-    const /** string */ name = encodeURI(this.urlParams_.get('name'));
-    const /** string */ sessionID = 
-        encodeURI(this.urlParams_.get('session-id'));
-    const /** Object */ response = await fetch(
-        `/get-session-info?name=${name}&session-id=${sessionID}`);
-    return await response.json();
   }
 
   /**

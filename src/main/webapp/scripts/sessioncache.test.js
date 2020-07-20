@@ -27,8 +27,8 @@ test('Test to see if stop is working correctly!', (done) => {
 
   setTimeout(() => {
     cache.stop();
-    expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
-    expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(40);
+    expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
+    expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(20);
     expect(cache.getSessionInformation()).toEqual(expectedResult);
     done();
   }, 30000);
@@ -42,7 +42,7 @@ test('Checks continuation of refreshing - no stop', (done) => {
 
       setTimeout(() => {
         expect(clearTimeoutSpy).toHaveBeenCalledTimes(0);
-        expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(10);
+        expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(5);
         expect(cache.getSessionInformation()).toEqual(expectedResult);
         done();
       }, 5000);
@@ -52,7 +52,7 @@ test('stopping before starting', () => {
   fetch.mockResponse(JSON.stringify(expectedResult));
   const cache = new SessionCache(testParams, 1000);
   cache.stop();
-  expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+  expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
   expect(setTimeoutSpy).toHaveBeenCalledTimes(0);
   expect(cache.getSessionInformation()).toBeFalsy();
 });
@@ -62,7 +62,7 @@ test('starting up, immediately stopping', () => {
   const cache = new SessionCache(testParams, 1000);
   cache.start();
   cache.stop();
-  expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+  expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
   expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
   expect(cache.getSessionInformation()).toBeFalsy();
 });
@@ -74,7 +74,7 @@ test('starting up after stopping', (done) => {
   cache.stop();
   cache.start();
   setTimeout(() => {
-    expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+    expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
     expect(setTimeoutSpy.mock.calls.length).toBeGreaterThanOrEqual(12);
     expect(cache.getSessionInformation()).toEqual(expectedResult);   
     done();
