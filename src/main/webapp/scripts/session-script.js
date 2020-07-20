@@ -46,10 +46,14 @@ function main() {
   sessionCache =
       new SessionCache(urlParameters);
   sessionCache.start();
-  setTimeout(() => {
-    sessionCache.getSessionInformation();
-    remoteToSession(sessionInformation.getIpOfVM());
-  }, 5000);
+  sessionCache.getSessionInformation().then(sesionObject => {
+    sessionInformation = sesionObject;
+  });
+  remoteToSession(sessionInformation.getIpOfVM());
+  // setTimeout(() => {
+  //   sessionCache.getSessionInformation();
+  //   remoteToSession(sessionInformation.getIpOfVM());
+  // }, 5000);
   refresh();
 }
 
@@ -59,7 +63,7 @@ function main() {
  * @param {string} ipOfVM
  */
 function remoteToSession(ipOfVM) {
-  const url = 'wss://'+ipOfVM+':6080';
+  const url = `wss://${ipOfVM}:6080`;
   sessionScreen = new RFB(document.getElementById('session-screen'), url,
       { credentials: { password: 'sessionparty' } });
   sessionScreen.addEventListener('connect', connectedToServer);
@@ -73,7 +77,9 @@ function remoteToSession(ipOfVM) {
  * Checks for new attendees and for whoever the controller is.
  */
 function refresh() {
-  sessionInformation = sessionCache.getSessionInformation();
+  sessionCache.getSessionInformation().then(sesionObject => {
+    sessionInformation = sesionObject;
+  });
   updateSessionInfoAttendees();
   updateController();
   setTimeout(() => {
