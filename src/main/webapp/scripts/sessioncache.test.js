@@ -21,7 +21,7 @@ afterEach(() => {
   fetch.resetMocks();
 });
 
-test.only('Test to see if stop is working correctly!', (done) => {
+test('Test to see if stop is working correctly!', (done) => {
   fetch.mockResponse(JSON.stringify(expected));
 
   const cache = new SessionCache(params, 1000, 1000);
@@ -93,14 +93,13 @@ test('starting up after stopping', (done) => {
   }, 5000);
 });
 
-test('Test to see if', (done) => {
+test.only('Test to see if starting and immediately checking', () => {
   fetch.mockResponse(JSON.stringify(expected));
 
-  const cache = new SessionCache(params, 1000, 1000);
+  const cache = new SessionCache(params, 1000);
   cache.start();
-
-  setTimeout(() => {
-    expect(cache.getSessionInformation()).toEqual(expected);
-    done();
-  }, .1);
+  cache.getSessionInformation().then(result => {
+    console.log(result);
+    expect(result).toEqual(expected);
+  });
 });

@@ -86,7 +86,6 @@ class SessionCache {
   async getSessionInformation() {
     this.sessionInformation_ = 
         await this.sessionInformationPoller_.getLastResult();
-    console.log(this.sessionInformation_);
     return await this.sessionInformationPoller_.getLastResult();
     // this.sessionInformation_.then(function(result) {
     //   console.log(result);
