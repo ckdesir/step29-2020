@@ -57,25 +57,35 @@ test('We can check if poll() is called correct amount' +
       }, 5000);
 });
 
-test('stopping before starting', () => {
+test.only('stopping before starting', async () => {
   fetch.mockResponse(JSON.stringify(expected));
   const cache = new SessionCache(params, 1000, 1000);
   cache.stop();
-  expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+  expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
   expect(pollSpy).toHaveBeenCalledTimes(0);
   expect(setTimeoutSpy).toHaveBeenCalledTimes(0);
-  expect(cache.getSessionInformation()).toBeFalsy();
+  try {
+    await expect(cache.getSessionInformation()).resolves.toEqual(expected);
+  } catch(e) {
+    expect(e.message).toBe('No contact with server.');
+  }
+  cache.getSessionInformation().catch(error => {
+    expect(error.message).toBe('No contact with server.');
+  });
+  //expect(cache.getSessionInformation()).toBeFalsy();
 });
 
-test('starting up, immediately stopping', () => {
+test.only('starting up, immediately stopping', async () => {
   fetch.mockResponse(JSON.stringify(expected));
   const cache = new SessionCache(params, 1000, 1000);
   cache.start();
   cache.stop();
-  expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+  expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
   expect(pollSpy).toHaveBeenCalledTimes(1);
   expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
-  expect(cache.getSessionInformation()).toBeFalsy();
+  cache.getSessionInformation().then(result => {
+    expect(result).toEqual(expected);
+  });
 });
 
 test('starting up after stopping', (done) => {
@@ -93,7 +103,7 @@ test('starting up after stopping', (done) => {
   }, 5000);
 });
 
-test.only('Test to see if starting and immediately checking', () => {
+test('Test to see if starting and immediately checking', async () => {
   fetch.mockResponse(JSON.stringify(expected));
 
   const cache = new SessionCache(params, 1000);
