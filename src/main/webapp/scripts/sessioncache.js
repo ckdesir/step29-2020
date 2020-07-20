@@ -30,7 +30,7 @@ class SessionCache {
      * @private {Object} 
      */
     this.sessionInformationPoller_ = 
-        new Poller(this.sessionInformationFetchRequest_, pollingCadence);
+        new Poller(this.sessionInformationRequest_, pollingCadence);
 
     /**
      * Holds what is being tracked by the SessionCache, the
@@ -47,55 +47,35 @@ class SessionCache {
     this.urlSearchParams_ = urlSearchParams;
   }
 
-  /**
-   * Refreshes (rate dictated by the refreshCadence) 
-   * the result from the session information poller 
-   * and updates the sessionInformation field.
-   * @private
-   */
-  async refreshSessionInformation_() {
-    this.sessionInformation_ = 
-        await this.sessionInformationPoller_.getLastResult().then(
-            result => {
-              return result;
-            });
-    /**
-     * Represents the handler returned by the setTimeout that refreshes.
-     * @private {number}
-     */
-    this.setTimeoutIdOfRefresh_ = setTimeout(() => {
-      this.refreshSessionInformation_();
-    }, this.refreshCadence_);
-  }
-
   /** 
-   * This method begins polling for session information and starts
-   * refreshing.
+   * This method begins polling for session information.
    */
   start() {
     this.sessionInformationPoller_.start();
-    this.refreshSessionInformation_();
   }
 
   /** 
-   * This method stops polling for session information and stops
-   * refreshing.
+   * This method stops polling for session information.
    */
   stop() {
     this.sessionInformationPoller_.stop();
-    clearTimeout(this.setTimeoutIdOfRefresh_);
   }
 
   /**
-   * Method sessionInformationFetchRequest_() is the fetch api request
-   * responsible for gathering information about the current session 
-   * the client is in.
+   * Method sessionInformationRequest_() is the fetch api request
+   * responsible for gathering information about the current session.
    * @private
    */
-  async sessionInformationFetchRequest_() {
+  async sessionInformationRequest_() {
+    // const /** string */ name = encodeURI(this.urlParams_.get('name'));
+    // const /** string */ sessionID = 
+    //     encodeURI(this.urlParams_.get('session-id'));
+    // fetch('https://api.exchangeratesapi.io/latest?base=USD').then(result => {
+      
+    //   return result.json();
+    // });
     const response = await fetch('https://api.exchangeratesapi.io/latest?base=USD');
-    const sessionInfo = await response.json();
-    return sessionInfo;
+    return await response.json();
   }
 
   /**
@@ -103,8 +83,24 @@ class SessionCache {
    * cache is in refreshing.
    * @return {Object} The Session object.
    */
-  getSessionInformation() {
-    return this.sessionInformation_;
+  async getSessionInformation() {
+    this.sessionInformation_ = 
+        await this.sessionInformationPoller_.getLastResult();
+    console.log(this.sessionInformation_);
+    return await this.sessionInformationPoller_.getLastResult();
+    // this.sessionInformation_.then(function(result) {
+    //   console.log(result);
+    // });
+    // return this.sessionInformationPoller_.getLastResult().then(function(result) {
+    //   return result;
+    // });
+    //console.log(this.sessionInformation_);
+    //return this.sessionInformation_;
+
+    // console.log(this.sessionInformationPoller_.getLastResult());
+    // this.sessionInformationPoller_.getLastResult().then(result => {
+    //   return await result;
+    // });
   }
 }
 
