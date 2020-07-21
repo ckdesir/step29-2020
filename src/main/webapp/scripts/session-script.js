@@ -2,6 +2,7 @@
 import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
 
 import { SessionCache } from '../scripts/sessioncache';
+import { Session } from '../scripts/session'
 
 /**
  * Represents (in miliseconds) the cadence at which the client is 
@@ -11,17 +12,30 @@ import { SessionCache } from '../scripts/sessioncache';
 const REFRESH_CADENCE = 30000;
 
 /**
- * Represents a cache of the session, keeps in contact with server for 
- * information about the current session.
+ * Represents (in miliseconds) how long users are alerted of any membership
+ * changes in the session. 
+ * @type {number}
+ */
+const DISPLAY_CADENCE = 4000;
+
+/**
+ * An array of who is currently in the session.
+ * @type {Object}
+ */
+let currentAttendees = new Array();
+
+/**
+ * Represents a cache of the session, keeps in contact with server  
+ * about the current session.
  * @type {Object}
  */
 let sessionCache;
 
 /**
- * Represents information about the current session, a Session object.
+ * Represents the current session, a Session object.
  * @type {Object}
  */
-let sessionInformation;
+let session;
 
 /**
  * Represents the noVNC client object; the single connection to the 
@@ -53,9 +67,9 @@ function main() {
       new SessionCache(urlParameters);
   sessionCache.start();
   sessionCache.getSessionInformation().then(sessionObject => {
-    sessionInformation = sessionObject;
+    session = sessionObject;
   });
-  remoteToSession(sessionInformation.getIpOfVM());
+  remoteToSession(session.getIpOfVM());
   refresh();
 }
 
@@ -71,6 +85,7 @@ function remoteToSession(ipOfVM) {
   sessionScreen.addEventListener('connect', connectedToServer);
   sessionScreen.addEventListener('disconnect', disconnectedFromServer);
   sessionScreen.viewOnly = true;
+  //display message about string of session
 }
 
 /**
@@ -80,7 +95,7 @@ function remoteToSession(ipOfVM) {
  */
 function refresh() {
   sessionCache.getSessionInformation().then(sessionObject => {
-    sessionInformation = sessionObject;
+    session = sessionObject;
   });
   updateSessionInfoAttendees();
   updateController();
@@ -95,7 +110,59 @@ function refresh() {
  * if they left the session. Alerts users of anyone who has left/entered.
  */
 function updateSessionInfoAttendees() {
-  throw new Error('Unimplemented');
+  const /** Object */ updatedAttendees = session.getListOfAttendees();
+  const /** Object */ newAttendees = new Array();
+  const /** Object */ attendeesThatHaveLeft = new Array();
+  for (const attendee of updatedAttendees) {
+    if (!currentAttendees.includes(attendee)) {
+      buildAttendeeDiv(attendee)
+      newAttendees.push(attendee);
+    }
+  }
+  for (const attendee of currentAttendees) {
+    if (!updatedAttendees.includes(attendee)) {
+      removeFromAttendeeDiv(attendee);
+      attendeesThatHaveLeft.push(attendee);
+    }
+  }
+  if (newAttendees.length) {
+    let /** string */ displayMessage =
+        'The following people have joined the session: ';
+    for (const attendee of newAttendees) {
+      displayMessage += `${attendee} `;
+    }
+    if (attendeesThatHaveLeft.length) {
+      displayMessage += '. The following people have left the session: ';
+      for (const attendee of attendeesThatHaveLeft) {
+        displayMessage += `${attendee} `;
+      }
+    }
+    notifyOfChangesToMembership(displayMessage);
+  } else if (!newAttendees.length && attendeesThatHaveLeft.length) {
+    let /** string */ displayMessage = 
+        'The following people have left the session: ';
+    for (const attendee of attendeesThatHaveLeft) {
+      displayMessage += `${attendee} `;
+    }
+    notifyOfChangesToMembership(displayMessage);
+  }
+  currentAttendees = updatedAttendees;
+}
+
+/**
+ * function notifyOfChangesToMembership() notifies 
+ * users of anyone who has left/entered.
+ * @param {string} displayMessage message to display to users
+ */
+function notifyOfChangesToMembership(displayMessage) {
+  displayMessage = 
+      `${displayMessage.substring(0, displayMessage.length-1)}.`;
+  const alertMembershipDiv = document.getElementById('alert-membership');
+  alertMembershipDiv.textContent = displayMessage;
+  alertMembershipDiv.className = 'display-message';
+  setTimeout( () => { 
+    alertMembershipDiv.className = ''; 
+  }, DISPLAY_CADENCE);
 }
 
 /**
@@ -109,17 +176,20 @@ function updateController() {
   const /** NodeListOf<HTMLSpanElement> */ controllerToggleList = 
       sessionInfoAttendeesDiv.querySelectorAll('span');
   if (urlParameters.get('name') === 
-    sessionInformation.getScreenNameOfController()) {
+    session.getScreenNameOfController()) {
       sessionScreen.viewOnly = false;
     }
   controllerToggleList.forEach(function(individualSpanElement) {
-    individualSpanElement.style.color = '#fff';
+    individualSpanElement.style.backgroundColor = '#fff';
   });
-
-  sessionInfoAttendeesDiv.querySelector(`#${sessionInformation.getScreenNameOfController()}`).parentElement.querySelector('span').style.color = '#fd5d00';
-  // change ui for controller span
-  // sessionInfoAttendeesDiv.querySelector(
-  //   '#'+sessionInformation.getScreenNameOfController()).parentElement.querySelector('span').style.color
+  // Looks for any element that has an id of the name of the 
+  // attendee (or the header displaying the name),
+  // finds the parent element (the attendee div as a whole), 
+  // finds the span and changes its color.
+  sessionInfoAttendeesDiv.querySelector(`#
+      ${session.getScreenNameOfController()}`)
+          .parentElement.querySelector('span').style.
+              backgroundColor = '#fd5d00';
 }
 
 /**
@@ -132,6 +202,7 @@ function buildAttendeeDiv(nameOfAttendee) {
   const /** HTMLElement */ sessionInfoAttendeesDiv =
       document.getElementById('session-info-attendees');
   const /** HTMLDivElement */ attendeeDiv = document.createElement('div');
+  attendeeDiv.className = 'attendee-div'
   const /** HTMLSpanElement */ controllerToggle = 
       document.createElement('span');
   controllerToggle.className = 'controller-toggle';
@@ -177,7 +248,7 @@ function removeAttendeeDiv(nameOfAttendee) {
  */
 function changeController(event) {
   if (urlParameters.get('name') === 
-    sessionInformation.getScreenNameOfController()) {
+    session.getScreenNameOfController()) {
       sessionScreen.viewOnly = true;
       // fetch call to change
     }

@@ -1,3 +1,6 @@
+import { Poller } from './poller';
+import { Session } from './session';
+
 /** 
  * SessionCache bridges the gap between the client and server.
  * Allows client to indirectly stay in contact with the server,
@@ -14,78 +17,63 @@ class SessionCache {
    *    session the client is in, holds information such as the
    *    session ID and the screen name of the current user.
    * @param {number=} [refreshCadence = 30000] Represents the cadence at
-   *    which the sessionInformation is refreshed. By default, the rate is 
+   *    which the Session object is refreshed. By default, the rate is
    *    30,000 milliseconds (or 30 seconds).  
    */
   constructor(urlParams, refreshCadence = 30000) {
+    /**
+     * function sessionRequest_() is the fetch api request
+     * responsible for contacting the server to retrieve the Session
+     * object.
+     * @private
+     */
+    async function sessionRequest_() {
+      const /** string */ name = encodeURI(urlParams.get('name'));
+      const /** string */ sessionID = 
+          encodeURI(urlParams.get('session-id'));
+      const /** Object */ response = await fetch(
+          `/get-session-info?name=${name}&session-id=${sessionID}`);
+      return await response.json();
+    }
+
     /** 
-     * Poller responsible for contacting the server for information about
-     * the current session.
+     * Poller responsible for contacting the server to retrieve the Session
+     * object.
      * @private {Object} 
      */
-    this.sessionInformationPoller_ = null;
-
-    /**
-     * Holds what is being tracked by the SessionCache, the
-     * information about the session.
-     * @private {Object}
-     */
-    this.sessionInformation_ = null;
-
-    /**
-     * @private {number}
-     */
-    this.refreshCadence_ = refreshCadence;
-
-    /**
-     * @private {Object}
-     */
-    this.urlParams_ = urlParams;
-  }
-
-  /**
-   * Refreshes the result from the session information poller 
-   * and updates the sessionInformation field.
-   * Keys are updated every 30 seconds.
-   * @private
-   */
-  refreshSessionInformation_() {
-    throw new Error('Unimplemented');
+    this.sessionPoller_ = 
+        new Poller(sessionRequest_, refreshCadence);
   }
 
   /** 
-   * This method begins polling for session information and starts
-   * refreshing.
+   * This method begins polling for the Session object.
    */
   start() {
-    throw new Error('Unimplemented');
+    this.sessionPoller_.start();
   }
 
   /** 
-   * This method stops polling for session information and stops
-   * refreshing.
+   * This method stops polling for the Session object.
    */
   stop() {
-    throw new Error('Unimplemented');
+    this.sessionPoller_.stop();
   }
 
   /**
-   * Method sessionInformationRequest_() is the fetch api request
-   * responsible for gathering information about the current session 
-   * the client is in.
-   * @private
-   */
-  sessionInformationRequest_() {
-    throw new Error('Unimplemented');
-  }
-
-  /**
-   * Returns information about the session, given how updated the 
+   * Returns a promise containing the Session object, given how updated the 
    * cache is in refreshing.
    * @return {Object} The Session object.
    */
-  getSessionInformation() {
-    throw new Error('Unimplemented');
+  async getSession() {
+    const /** Object */ session =
+        await this.sessionPoller_.getLastResult();
+    return new Promise((resolve, reject) => {
+      if(session) {
+        resolve(Session.fromObject(session));
+      } else {
+        reject(new Error('No contact with server.'));
+      }
+    });
   }
 }
 

@@ -33,11 +33,15 @@
     this.pollingPeriod_ = pollingPeriod;
 
     /**
-     * @private {number} represents the amount of times polling has 
-     *    occured. 
+     * Represents the handler returned by the setTimeout that continues
+     * to poll.
+     * @private {?number}
      */
-    this.attempts_ = 0;
-
+    this.setTimeoutId_ = 0;
+    
+    /**
+     * @private {function(): any}
+     */
     this.pollingFunction_ = pollingFunction;
   }
 
@@ -47,14 +51,17 @@
    * @private
    */ 
   poll_() {
-    throw new Error('Unimplemented');
+    this.result_ = this.pollingFunction_();
+    this.setTimeoutId_ = setTimeout(() => {
+      this.poll_();
+    }, this.pollingPeriod_);
   }
 
   /** 
    * This method begins polling. 
    */
   start() {
-    throw new Error('Unimplemented');
+    this.poll_();
   }
 
   /** 
@@ -62,7 +69,7 @@
    * function instance.
    */
   stop() {
-    throw new Error('Unimplemented');
+    clearTimeout(this.setTimeoutId_);
   }
 
   /**
@@ -71,19 +78,7 @@
    * @return {?Object} The result.
    */
   getLastResult() {
-    throw new Error('Unimplemented');
-  }
-
-  /**
-   * Used for testing, limits the number of times the object is polled. 
-   * @param {?number=} maxAttempts limits the amount of times polling 
-   *    occurs by the number of maxAttempts.
-   */
-  testOnlySetMaxPollAttempts(maxAttempts) {
-    /**
-     * @private {number}
-     */
-    this.maxAttempts_ = maxAttempts;
+    return this.result_;
   }
 }
 
