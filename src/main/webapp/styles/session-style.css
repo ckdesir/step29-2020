@@ -154,7 +154,6 @@ html {
 }
 
 .attendee-name {
-  float: left;
   display: inline-block;
   margin-left: 5px;
 }
@@ -165,18 +164,18 @@ html {
   border: 5px solid #fd5d00;
   display: inline-block;
   height: 60%;
-  width: 10%;
-  right: 0;
   position: absolute;
+  right: 0;
   top: 50%;
   transform: translate(-50%, -50%);
+  width: 10%;
 }
 
 .attendee-div {
-  position: relative;
-  height: 20%;
   border: 2px solid #fd5d00;
+  height: 20%;
   margin: 10px 0 10px;
+  position: relative;
 }
 
 #header-bar-attendee {
