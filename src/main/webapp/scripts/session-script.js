@@ -1,6 +1,5 @@
 // RFB holds the API to connect and communicate with a VNC server   
-import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
-
+//import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
 import { SessionCache } from '../scripts/sessioncache';
 import { Session } from '../scripts/session'
 
@@ -201,8 +200,8 @@ function updateController() {
   // attendee (or the header displaying the name),
   // finds the parent element (the attendee div as a whole), 
   // finds the span and changes its color.
-  sessionInfoAttendeesDiv.querySelector(`#
-      ${session.getScreenNameOfController()}`)
+  sessionInfoAttendeesDiv.querySelector(`#${session.
+      getScreenNameOfController()}`)
           .parentElement.querySelector('span').style.
               backgroundColor = '#fd5d00';
 }
@@ -290,7 +289,6 @@ function closeDisplay(element) {
  * in into the clipboard.
  */
 function copyTextToClipboard(element) {
-  // may have to create a feaux element with the text passed in, depends
   element.select();
   document.execCommand('copy');
 }
@@ -303,7 +301,11 @@ function disconnectedFromServer() {
   throw new Error('Unimplemented');
 }
 
-export { openSessionInfo, closeSessionInfo, copyTextToClipboard, 
-  buildAttendeeDiv, removeAttendeeDiv, changeController, 
-  updateController, updateSessionInfoAttendees, 
-  refresh, remoteToSession };
+function test() {
+  session = new URLSearchParams(window.location.search);
+}
+
+export { openSessionInfo, closeDisplay, copyTextToClipboard, 
+  buildAttendeeDiv, removeFromAttendeeDiv, changeController, 
+  updateController, updateSessionInfoAttendees, notifyOfChangesToMembership
+  , refresh, remoteToSession, urlParameters, session };
