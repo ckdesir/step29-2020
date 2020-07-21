@@ -278,11 +278,11 @@ function openSessionInfo() {
 }
 
 /**
- * function closeSessionInfo() closes the div container
- * that has information about the session.
+ * function closeDisplay changes the display of the parent of the element
+ * passed in to 'none'
  */
-function closeSessionInfo() {
-  document.getElementById('session-info-div').style.display = 'none';
+function closeDisplay(element) {
+  document.getElementById(element.parentNode.id).style.display = 'none';
 }
 
 /**

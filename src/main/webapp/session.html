@@ -13,6 +13,7 @@
         <span id="session-info-span-text"><b>Session Info</b></span></span>
   </div>
   <div id="welcome-message">
+    <span class="close" onclick="closeDisplay(this)">X</span>
     <p>Thank you for using Virtual Movie Night! 
       Share the Session ID below with other party goers
       to get the party started!
@@ -25,7 +26,7 @@
   <div id="session-status" class="center-text">Connecting...</div>
   <div id="session-screen"></div>
   <div id="session-info-div">
-    <span id="close" onclick="closeSessionInfo()">X</span>
+    <span class="close" onclick="closeDisplay(this)">X</span>
     <div id="session-id-div">
       <label class="session-id-label" for="session-info-field">Session-ID:
       </label>

@@ -36,7 +36,7 @@ html {
   width: 400px;
 }
 
-#close {
+.close {
   cursor: pointer;
   padding: 12px 14px;
   position: absolute;
@@ -44,7 +44,7 @@ html {
   top: 0;
 }
 
-#close:hover {
+.close:hover {
   background: #bbb;
 }
 
