@@ -69,8 +69,23 @@ function main() {
   sessionCache.getSessionInformation().then(sessionObject => {
     session = sessionObject;
   });
+  initializeElements();
   remoteToSession(session.getIpOfVM());
   refresh();
+}
+
+function initializeElements() {
+  const sessionIdField = 
+      document.getElementById('session-info-field');
+  sessionIdField.value = session.getSessionId();
+  sessionIdField.readOnly = true;
+
+  const welcomeMessageField = 
+      document.getElementById('welcome-message-field');
+  welcomeMessageField.value = session.getSessionId();
+  welcomeMessageField.readOnly = true;
+
+  // possibly onclicks?
 }
 
 /**
@@ -223,12 +238,12 @@ function buildAttendeeDiv(nameOfAttendee) {
 }
 
 /**
- * function removeAttendeeDiv() removes the div element containing
+ * function removeFromAttendeeDiv() removes the div element containing
  * all the elements an attendee from the session info attendees div
  * based off the name passed in.
  * @param {string} nameOfAttendee name of attendee to delete
  */
-function removeAttendeeDiv(nameOfAttendee) {
+function removeFromAttendeeDiv(nameOfAttendee) {
   const /** HTMLElement */ sessionInfoAttendeesDiv =
       document.getElementById('session-info-attendees');
   // Looks for any element that has an id of the name of the attendee
@@ -271,13 +286,12 @@ function closeSessionInfo() {
 }
 
 /**
- * function copyTextToClipboard() copies the text in the input field
- * with the id 'session-id-field' into the clipboard.
+ * function copyTextToClipboard() copies the text of the element passed
+ * in into the clipboard.
  */
-function copyTextToClipboard() {
-  const /** HTMLElement */ sessionIdElement =
-      document.getElementById('session-id-field');
-  sessionIdElement.select();
+function copyTextToClipboard(element) {
+  // may have to create a feaux element with the text passed in, depends
+  element.select();
   document.execCommand('copy');
 }
 

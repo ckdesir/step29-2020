@@ -49,11 +49,8 @@ test('already opened', () => {
   const div = document.createElement('div');
   div.style.display = 'block';
   div.id = 'session-info-div';
-
   container.appendChild(div);
-
   functions.openSessionInfo();
-
   expect(div.style.display).toEqual('block');
 });
 
