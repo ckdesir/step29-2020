@@ -21,7 +21,7 @@ const DISPLAY_CADENCE = 4000;
  * An array of who is currently in the session.
  * @type {Object}
  */
-let currentAttendees = new Array();
+let currentAttendees = ['Jessica', 'Bryan'];
 
 /**
  * Represents a cache of the session, keeps in contact with server  
@@ -34,7 +34,7 @@ let sessionCache;
  * Represents the current session, a Session object.
  * @type {Object}
  */
-let session;
+let session = new Session();
 
 /**
  * Represents the noVNC client object; the single connection to the 
@@ -125,17 +125,17 @@ function refresh() {
  */
 function updateSessionInfoAttendees() {
   const /** Object */ updatedAttendees = session.getListOfAttendees();
-  const /** Object */ newAttendees = new Array();
-  const /** Object */ attendeesThatHaveLeft = new Array();
+  const /** Object */ newAttendees = [];
+  const /** Object */ attendeesThatHaveLeft = [];
   for (const attendee of updatedAttendees) {
     if (!currentAttendees.includes(attendee)) {
-      buildAttendeeDiv(attendee)
+      exportFunctions.buildAttendeeDiv(attendee)
       newAttendees.push(attendee);
     }
   }
   for (const attendee of currentAttendees) {
     if (!updatedAttendees.includes(attendee)) {
-      removeFromAttendeeDiv(attendee);
+      exportFunctions.removeFromAttendeeDiv(attendee);
       attendeesThatHaveLeft.push(attendee);
     }
   }
@@ -151,14 +151,15 @@ function updateSessionInfoAttendees() {
         displayMessage += `${attendee} `;
       }
     }
-    notifyOfChangesToMembership(displayMessage);
+    console.log(displayMessage);
+    exportFunctions.notifyOfChangesToMembership(displayMessage);
   } else if (!newAttendees.length && attendeesThatHaveLeft.length) {
     let /** string */ displayMessage = 
         'The following people have left the session: ';
     for (const attendee of attendeesThatHaveLeft) {
       displayMessage += `${attendee} `;
     }
-    notifyOfChangesToMembership(displayMessage);
+    exportFunctions.notifyOfChangesToMembership(displayMessage);
   }
   currentAttendees = updatedAttendees;
 }
@@ -169,12 +170,12 @@ function updateSessionInfoAttendees() {
  * @param {string} displayMessage message to display to users
  */
 function notifyOfChangesToMembership(displayMessage) {
-  displayMessage = 
-      `${displayMessage.substring(0, displayMessage.length-1)}.`;
+  displayMessage = `${displayMessage.
+      substring(0, displayMessage.length-1)}.`;
   const alertMembershipDiv = document.getElementById('alert-membership');
   alertMembershipDiv.textContent = displayMessage;
   alertMembershipDiv.className = 'display-message';
-  setTimeout( () => { 
+  setTimeout(() => { 
     alertMembershipDiv.className = ''; 
   }, DISPLAY_CADENCE);
 }
@@ -301,9 +302,13 @@ function disconnectedFromServer() {
   throw new Error('Unimplemented');
 }
 
-function test() {
-  session = new URLSearchParams(window.location.search);
+const exportFunctions = {
+  buildAttendeeDiv,
+  notifyOfChangesToMembership,
+  removeFromAttendeeDiv
 }
+
+export default exportFunctions;
 
 export { openSessionInfo, closeDisplay, copyTextToClipboard, 
   buildAttendeeDiv, removeFromAttendeeDiv, changeController, 

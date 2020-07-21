@@ -1,4 +1,13 @@
-import * as functions from './session-script';
+import exportFunctions, * as functions from './session-script';
+import { Session } from './session';
+
+const buildAttendeeDivSpy = jest.spyOn(exportFunctions, 'buildAttendeeDiv');
+const removeFromAttendeeDivSpy = jest.spyOn(exportFunctions, 'removeFromAttendeeDiv');
+const notifyOfChangesToMembershipSpy = jest.spyOn(exportFunctions, 'notifyOfChangesToMembership');
+
+afterEach(() => {    
+  jest.clearAllMocks();
+});
 
 test('We can check if correct errors are thrown -refresh', () => {
   try {
@@ -16,7 +25,7 @@ test('We can check if correct errors are thrown -remoteToSession', () => {
   }
 });
 
-test.only('makes sure notifyOfChangesToMembership is correctly displaying message', (done) => {
+test('makes sure notifyOfChangesToMembership is correctly displaying message', (done) => {
   const displayMessage = 'How are you ';
   document.body.innerHTML = '';
   const alertMembershipDiv =
@@ -35,12 +44,30 @@ test.only('makes sure notifyOfChangesToMembership is correctly displaying messag
   }, 6000);
 });
 
-test('We can check if correct errors are thrown' + 
+test.only('A new member' + 
     '-updateSessionInfoAttendees', () => {
-      
+      const expectedMessage =
+          `The following people have joined the session: ${'Miguel'} `;
+      document.body.innerHTML = '';
+      const sessionInfoAttendeeDiv =
+          document.createElement('div');
+      sessionInfoAttendeeDiv.id = 'session-info-attendees';
+      document.body.appendChild(sessionInfoAttendeeDiv);
+      const alertMembershipDiv =
+          document.createElement('div');
+      alertMembershipDiv.id = 'alert-membership';
+      document.body.appendChild(alertMembershipDiv);
+      const sessionSpy = 
+           jest.spyOn(Session.prototype, 'getListOfAttendees').mockReturnValue(['Jessica', 'Bryan', 'Miguel']);
+      functions.buildAttendeeDiv('Jessica');
+      functions.buildAttendeeDiv('Bryan');
+      functions.updateSessionInfoAttendees();
+      expect(notifyOfChangesToMembershipSpy).toHaveBeenCalledWith(expectedMessage);
+      expect(buildAttendeeDivSpy).toBeCalledTimes(1);
+      expect(removeFromAttendeeDivSpy).toBeCalledTimes(0);
 });
 
-test.skip('Tests to see if controller updates correctly UI wise', () => {
+test('Tests to see if controller updates correctly UI wise', () => {
   document.body.innerHTML = '';
   const sessionInfoAttendeeDiv =
       document.createElement('div');
