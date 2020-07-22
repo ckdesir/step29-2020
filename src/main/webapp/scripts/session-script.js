@@ -54,7 +54,8 @@ function changeController(event) {
   if (urlParameters.get('name') === 
     session.getScreenNameOfController()) {
       sessionScreen.viewOnly = true;
-      //name of person clicked: event.target.parentElement.querySelector('h3').id
+      // name of person clicked: event.target.parentElement.querySelector('h3').id
+      // .querySelector('.attendee-name').id
       // fetch call to change
     }
 }
@@ -76,10 +77,10 @@ function disconnectedFromServer() {
   document.getElementById('status').display = 'block';
   document.getElementById('status').textContent = 'Reconnecting...';
   // while(isNotConnected) {
-    //call on remoteToSession(session.getIpOfVM())
-    //problem with this is that disconnectedFromServer
-    //could be called multiple times? since everything is still disconnected
-    //it client tries to connect again, this would be called
+    // call on remoteToSession(session.getIpOfVM())
+    // problem with this is that disconnectedFromServer
+    // could be called multiple times? since everything is still disconnected
+    // it client tries to connect again, this would be called
   //}
 }
 
