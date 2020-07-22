@@ -50,7 +50,7 @@ function copyTextToClipboard() {
  * with information on the new controller.
  * @param {MouseEvent} event
  */
-function changeController(event) {
+function passController(event) {
   if (urlParameters.get('name') === 
     session.getScreenNameOfController()) {
       sessionScreen.viewOnly = true;
