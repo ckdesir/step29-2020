@@ -18,6 +18,14 @@
 let isNotConnected = true;
 
 /**
+ * Represents the ServerClient object responsible for
+ * keeping up-to-date with the current session and handles many
+ * of the client-to-server interactions, like passing the controller.
+ * @type {ServerClient}
+ */
+const client = new ServerClient(urlParameters);
+
+/**
  * function openSessionInfo() displays the div container
  * that has information about the session.
  */
@@ -54,9 +62,8 @@ function passController(event) {
   if (urlParameters.get('name') === 
     session.getScreenNameOfController()) {
       sessionScreen.viewOnly = true;
-      // name of person clicked: event.target.parentElement.querySelector('h3').id
-      // .querySelector('.attendee-name').id
-      // fetch call to change
+      client.changeController(
+          event.target.parentElement.querySelector('h3').id);
     }
 }
 
