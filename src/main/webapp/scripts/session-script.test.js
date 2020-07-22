@@ -1,5 +1,6 @@
 import * as sessionscript from './session-script';
 import { Session } from './session';
+import { ServerClient } from './serverclient';
 
 afterEach(() => {    
   jest.clearAllMocks();
@@ -97,7 +98,7 @@ test('Tests to see if controller updates correctly UI wise', () => {
 test('tests changeToReadOnly()', () => {
   document.body.innerHTML = '';
   const sessionSpy = 
-      jest.spyOn(Session.prototype, 'getScreenNameOfController').
+      jest.spyOn(Session.prototype, 'getSessionId').
           mockReturnValue('1eee3414123');
   const sessionInfoInput = document.createElement('input');
   sessionInfoInput.id = 'session-info-input';
@@ -108,6 +109,60 @@ test('tests changeToReadOnly()', () => {
   expect(welcomeMessageInput.readOnly).toBe(true);
   expect(sessionInfoInput.value).toEqual('1eee3414123');
   expect(welcomeMessageInput.value).toEqual('1eee3414123');
+});
+
+test('tests passController() - controller clicks', () => {
+  const urlParamSpy = 
+      jest.spyOn(window.URLSearchParams.prototype, 'get').
+          mockReturnValue('Jessica');
+  const sessionSpy = 
+      jest.spyOn(Session.prototype, 'getScreenNameOfController').
+          mockReturnValue('Jessica');
+  const passControllerSpy = 
+      jest.spyOn(ServerClient.prototype, 'passController');
+  const attendeeDiv = document.createElement('div');
+  attendeeDiv.className = 'attendee-div'
+  const controllerToggle = 
+      document.createElement('span');
+  controllerToggle.className = 'controller-toggle';
+  controllerToggle.addEventListener('click', 
+      sessionscript.passController, false);
+  const attendeeName =
+      document.createElement('h3');
+  attendeeName.innerHTML = 'Naomi';
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = 'Naomi';
+  attendeeDiv.appendChild(controllerToggle);
+  attendeeDiv.appendChild(attendeeName);
+  controllerToggle.click();
+  expect(passControllerSpy).toBeCalledWith('Naomi');
+});
+
+test('tests passController() - controller does not click', () => {
+  const urlParamSpy = 
+      jest.spyOn(window.URLSearchParams.prototype, 'get').
+          mockReturnValue('Jessica');
+  const sessionSpy = 
+      jest.spyOn(Session.prototype, 'getScreenNameOfController').
+          mockReturnValue('Naomi');
+  const passControllerSpy = 
+      jest.spyOn(ServerClient.prototype, 'passController');
+  const attendeeDiv = document.createElement('div');
+  attendeeDiv.className = 'attendee-div'
+  const controllerToggle = 
+      document.createElement('span');
+  controllerToggle.className = 'controller-toggle';
+  controllerToggle.addEventListener('click', 
+      sessionscript.passController, false);
+  const attendeeName =
+      document.createElement('h3');
+  attendeeName.innerHTML = 'Bob';
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = 'Bob';
+  attendeeDiv.appendChild(controllerToggle);
+  attendeeDiv.appendChild(attendeeName);
+  controllerToggle.click();
+  expect(passControllerSpy).toBeCalledTimes(0);
 });
 
 test(`We can check if correct errors are thrown -

@@ -1,27 +1,14 @@
 // RFB holds the API to connect and communicate with a VNC server   
 import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
-import { SessionCache } from './sessioncache';
+import { ServerClient } from './serverclient';
 import { Session } from './session'
 
 /**
- * Represents (in miliseconds) the cadence at which the client is 
- * refreshed. 
+ * Represents (in miliseconds) the cadence at which the UI is updated
+ * (if needed). 
  * @type {number}
  */
-const REFRESH_CADENCE_MS = 30000;
-
-/**
- * Represents a cache of the session, keeps in contact with server  
- * about the current session.
- * @type {SessionCache}
- */
-let sessionCache;
-
-/**
- * Represents the current session, a Session object.
- * @type {Session}
- */
-let session;
+const UPDATE_UI_CADENCE_MS = 30000;
 
 /**
  * Represents the noVNC client object; the single connection to the 
@@ -39,6 +26,14 @@ let sessionScreen;
 const urlParameters = new URLSearchParams(window.location.search);
 
 /**
+ * Represents the ServerClient object responsible for
+ * keeping up-to-date with the current session and handles many
+ * of the client-to-server interactions, like passing the controller.
+ * @type {ServerClient}
+ */
+const client = new ServerClient(urlParameters);
+
+/**
  * This waits until the webpage loads and then it calls the
  * anonymous function, which calls main.
  */
@@ -49,14 +44,10 @@ window.onload = function() { main(); }
  * the behind the scenes operations, like caching.
  */
 function main() {
-  sessionCache = new SessionCache(urlParameters);
-  sessionCache.start();
-  sessionCache.getSession().then(sessionObject => {
-    session = sessionObject;
-  });
+  client.start();
   changeToReadOnly();
-  remoteToSession(session.getIpOfVM());
-  refresh();
+  remoteToSession();
+  updateUI();
 }
 
 /**
@@ -66,44 +57,45 @@ function main() {
  * to read only.
  */
 function changeToReadOnly() {
-  const /** HTMLElement */ sessionInfoInput = 
-      document.getElementById('session-info-input');
-  sessionInfoInput.value = session.getSessionId();
-  sessionInfoInput.readOnly = true;
-  const /** HTMLElement */ welcomeMessageInput = 
-      document.getElementById('welcome-message-input');
-  welcomeMessageInput.value = session.getSessionId();
-  welcomeMessageInput.readOnly = true;
+  client.getSession().then(session => {
+    const /** HTMLElement */ sessionInfoInput = 
+    document.getElementById('session-info-input');
+    sessionInfoInput.value = session.getSessionId();
+    sessionInfoInput.readOnly = true;
+    const /** HTMLElement */ welcomeMessageInput = 
+        document.getElementById('welcome-message-input');
+    welcomeMessageInput.value = session.getSessionId();
+    welcomeMessageInput.readOnly = true;
+  });
 }
 
 /**
  * function remoteToSession() uses the noVNC library
  * in order to connect to a session.
- * @param {string} ipOfVM required to connect to a session
  */
-function remoteToSession(ipOfVM) {
-  const /** string */ url = `wss://${ipOfVM}:6080`;
-  sessionScreen = new RFB(document.getElementById('session-screen'), url,
-      { credentials: { password: 'session' } });
-  sessionScreen.addEventListener('connect', connectedToServer);
-  sessionScreen.addEventListener('disconnect', disconnectedFromServer);
-  sessionScreen.viewOnly = true;
-  document.getElementById('welcome-message').style.display = 'block';
+function remoteToSession() {
+  client.getSession().then(session => {
+    const /** string */ url =
+      `wss://${session.getIpOfVM()}:6080`;
+    sessionScreen = new RFB(document.getElementById('session-screen'), url,
+        { credentials: { password: 'session' } });
+    sessionScreen.addEventListener('connect', connectedToServer);
+    sessionScreen.addEventListener('disconnect', disconnectedFromServer);
+    sessionScreen.viewOnly = true;
+    document.getElementById('welcome-message').style.display = 'block';
+  });
 }
 
 /**
- * function refresh() refreshes information client side, 
- * given how updated the server is with changes. 
- * Checks for new attendees and for whoever the controller is.
+ * function updateUI() refreshes information client side, 
+ * updating the UI in checking for new attendees and for
+ * whoever the controller is.
  */
-function refresh() {
-  sessionCache.getSession().then(sessionObject => {
-    session = sessionObject;
-  });
+function updateUI() {
   updateController();
   setTimeout(() => {
-    refresh();
-  }, REFRESH_CADENCE_MS);
+    updateUI();
+  }, UPDATE_UI_CADENCE_MS);
 }
 
 /**
@@ -112,21 +104,40 @@ function refresh() {
  * and updating user interface.
  */
 function updateController() {
-  const /** HTMLElement */ sessionInfoAttendeesDiv =
-      document.getElementById('session-info-attendees');
-  const /** NodeListOf<HTMLSpanElement> */ controllerToggleList = 
-      sessionInfoAttendeesDiv.querySelectorAll('span');
-  if (urlParameters.get('name') === 
-    session.getScreenNameOfController()) {
-      sessionScreen.viewOnly = false;
-    }
-  controllerToggleList.forEach(function(individualSpanElement) {
-    individualSpanElement.style.backgroundColor = '#fff';
+  client.getSession().then(session => {
+    const /** HTMLElement */ sessionInfoAttendeesDiv =
+        document.getElementById('session-info-attendees');
+    const /** NodeListOf<HTMLSpanElement> */ controllerToggleList = 
+        sessionInfoAttendeesDiv.querySelectorAll('span');
+    if (urlParameters.get('name') === 
+      session.getScreenNameOfController()) {
+        sessionScreen.viewOnly = false;
+      }
+    controllerToggleList.forEach(function(individualSpanElement) {
+      individualSpanElement.style.backgroundColor = '#fff';
+    });
+    sessionInfoAttendeesDiv.querySelector(`#${session.
+        getScreenNameOfController()}`)
+            .parentElement.querySelector('span').style.
+                backgroundColor = '#fd5d00';
   });
-  sessionInfoAttendeesDiv.querySelector(`#${session.
-      getScreenNameOfController()}`)
-          .parentElement.querySelector('span').style.
-              backgroundColor = '#fd5d00';
+}
+
+/**
+ * If the current controller of the session clicks on the controller 
+ * toggle, their controller status is revoked and the server is updated
+ * with information on the new controller.
+ * @param {MouseEvent} event
+ */
+function passController(event) {
+  client.getSession().then(session => {
+    if (urlParameters.get('name') === 
+      session.getScreenNameOfController()) {
+        sessionScreen.viewOnly = true;
+        client.passController(
+            event.target.parentElement.querySelector('h3').id);
+      }
+  });
 }
 
 /**
@@ -172,5 +183,5 @@ function disconnectedFromServer() {
 }
 
 export { openSessionInfo, closeDisplay, copyTextToClipboard,  
-  updateController, remoteToSession, 
+  updateController, remoteToSession, passController,
   connectedToServer, disconnectedFromServer, changeToReadOnly };
