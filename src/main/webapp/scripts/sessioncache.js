@@ -13,8 +13,8 @@ import { Session } from './session';
 class SessionCache {
   /**
    * Initalizes a SessionCache object.
-   * @param {Object} urlParams Represents the URLSearchParams of the
-   *    session the client is in, holds information such as the
+   * @param {URLSearchParams} urlParams Represents the URLSearchParams 
+   *    of the session the client is in, holds information such as the
    *    session ID and the screen name of the current user.
    * @param {number=} [refreshCadence = 30000] Represents the cadence at
    *    which the Session object is refreshed. By default, the rate is
@@ -25,13 +25,14 @@ class SessionCache {
      * function sessionRequest_() is the fetch api request
      * responsible for contacting the server to retrieve the Session
      * object.
+     * @return {Promise<any>} Promise of server response
      * @private
      */
     async function sessionRequest_() {
       const /** string */ name = encodeURI(urlParams.get('name'));
       const /** string */ sessionID = 
           encodeURI(urlParams.get('session-id'));
-      const /** Object */ response = await fetch(
+      const /** Response */ response = await fetch(
           `/get-session-info?name=${name}&session-id=${sessionID}`);
       return await response.json();
     }
@@ -39,7 +40,7 @@ class SessionCache {
     /** 
      * Poller responsible for contacting the server to retrieve the Session
      * object.
-     * @private {Object} 
+     * @private {Poller} 
      */
     this.sessionPoller_ = 
         new Poller(sessionRequest_, refreshCadence);
@@ -62,10 +63,10 @@ class SessionCache {
   /**
    * Returns a promise containing the Session object, given how updated the 
    * cache is in refreshing.
-   * @return {Object} The Promise object
+   * @return {Promise} The Promise object
    */
   async getSession() {
-    const /** Object */ session =
+    const /** ?Object */ session =
         await this.sessionPoller_.getLastResult();
     return new Promise((resolve, reject) => {
       if(session) {

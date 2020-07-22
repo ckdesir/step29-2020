@@ -5,8 +5,6 @@ import fetch from 'jest-fetch-mock';
 fetch.enableMocks();
 jest.setTimeout(40000);
 
-const setTimeoutSpy = jest.spyOn(window, 'setTimeout');
-const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');
 const testParams =  new URLSearchParams('?session-id=EEEE7&name=chris');
 const expectedResult = Session.fromObject({
   sessionID: 'EEEE7',
@@ -26,8 +24,6 @@ test('Test to see if stop is working correctly!', (done) => {
   cache.start();
   setTimeout(async () => {
     cache.stop();
-    expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
-    expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(3);
     await expect(cache.getSession()).
         resolves.toEqual(expectedResult);
     done();
@@ -39,8 +35,6 @@ test('Checks continuation of refreshing - no stop', (done) => {
   const cache = new SessionCache(testParams, 1000);
   cache.start();
   setTimeout(async () => {
-    expect(clearTimeoutSpy).toHaveBeenCalledTimes(0);
-    expect(setTimeoutSpy.mock.calls.length).toBeGreaterThan(1);
     await expect(cache.getSession()).
         resolves.toEqual(expectedResult);
     done();
@@ -51,8 +45,6 @@ test('stopping before starting', async () => {
   fetch.mockResponse(JSON.stringify(expectedResult));
   const cache = new SessionCache(testParams, 1000);
   cache.stop();
-  expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
-  expect(setTimeoutSpy).toHaveBeenCalledTimes(0);
   await expect(cache.getSession()).
       rejects.toThrowError('No contact with server.');
 });
@@ -62,8 +54,6 @@ test('starting up, immediately stopping', async () => {
   const cache = new SessionCache(testParams, 1000);
   cache.start();
   cache.stop();
-  expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
-  expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
   await expect(cache.getSession()).
       resolves.toEqual(expectedResult);
 });
@@ -75,8 +65,6 @@ test('starting up after stopping', (done) => {
   cache.stop();
   cache.start();
   setTimeout(async () => {
-    expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
-    expect(setTimeoutSpy.mock.calls.length).toBeGreaterThanOrEqual(3); 
     await expect(cache.getSession()).
         resolves.toEqual(expectedResult); 
     done();
