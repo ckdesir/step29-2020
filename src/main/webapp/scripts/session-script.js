@@ -13,6 +13,11 @@
 // limitations under the License.
 
 /**
+ * @type {boolean}
+ */
+let isNotConnected = true;
+
+/**
  * function openSessionInfo() displays the div container
  * that has information about the session.
  */
@@ -37,6 +42,45 @@ function copyTextToClipboard() {
       document.getElementById('session-id-field');
   sessionIdElement.select();
   document.execCommand('copy');
+}
+
+/**
+ * If the current controller of the session clicks on the controller 
+ * toggle, their controller status is revoked and the server is updated
+ * with information on the new controller.
+ * @param {MouseEvent} event
+ */
+function changeController(event) {
+  if (urlParameters.get('name') === 
+    session.getScreenNameOfController()) {
+      sessionScreen.viewOnly = true;
+      //name of person clicked: event.target.parentElement.querySelector('h3').id
+      // fetch call to change
+    }
+}
+
+/**
+ * function connectedToServer() is called on once the session connects.
+ */
+function connectedToServer() {
+  document.getElementById('status').display = 'none';
+  isNotConnected = false;
+}
+
+/**
+ * function disconnectedFromServer() is called on once the session
+ * disconnects.
+ */
+function disconnectedFromServer() {
+  isNotConnected = true;
+  document.getElementById('status').display = 'block';
+  document.getElementById('status').textContent = 'Reconnecting...';
+  // while(isNotConnected) {
+    //call on remoteToSession(session.getIpOfVM())
+    //problem with this is that disconnectedFromServer
+    //could be called multiple times? since everything is still disconnected
+    //it client tries to connect again, this would be called
+  //}
 }
 
 module.exports = {
