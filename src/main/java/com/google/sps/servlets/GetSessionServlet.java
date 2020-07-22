@@ -30,8 +30,8 @@ public class GetSessionServlet extends HttpServlet {
     Gson gson = new Gson();
     JsonElement jsonElement = gson.toJsonTree(session);
     jsonElement.getAsJsonObject().addProperty("listOfAttendees", gson.toJson(listOfAttendees));
-    String json = gson.toJson(jsonElement);
+    //String json = gson.toJson(jsonElement);
     response.setContentType("application/json;");
-    response.getWriter().println(json);
+    response.getWriter().println(gson.toJson(jsonElement));
   }
 }
