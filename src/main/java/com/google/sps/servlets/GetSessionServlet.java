@@ -2,6 +2,10 @@ package com.google.sps.servlets;
 
 import com.google.gson.*;
 
+import org.json.simple.*;
+
+import java.util.*;
+
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +29,7 @@ public class GetSessionServlet extends HttpServlet {
     // List<String/Attendee?> listOfAttendees = getListOfAttendees(sessionId);
     Gson gson = new Gson();
     JsonElement jsonElement = gson.toJsonTree(session);
-    jsonElement.getAsJsonObject().addProperty("listOfAttendees", String.join(", ", listOfAttendees);
+    jsonElement.getAsJsonObject().addProperty("listOfAttendees", gson.toJson(listOfAttendees));
     String json = gson.toJson(jsonElement);
     response.setContentType("application/json;");
     response.getWriter().println(json);
