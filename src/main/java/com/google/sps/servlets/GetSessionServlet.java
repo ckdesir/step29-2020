@@ -4,7 +4,7 @@ import com.google.sps.data.Attendee;
 import com.google.sps.data.AttendeeInterface;
 import com.google.sps.data.DatastoreClient;
 import com.google.sps.data.DatastoreClientInterface;
-import com.google.sps.data.Session;
+import com.google.sps.data.SessionInterface;
 import com.google.gson.*;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -29,7 +29,7 @@ public class GetSessionServlet extends HttpServlet {
     String name = URLDecoder.decode(request.getParameter("name"), StandardCharsets.UTF_8);
     AttendeeInterface updatedAttendee = new Attendee(sessionId, name, new Date());
     datastoreClient.insertOrUpdateAttendee(updatedAttendee);
-    Optional<Session> session = datastoreClient.getSession(sessionId);
+    Optional<SessionInterface> session = datastoreClient.getSession(sessionId);
     if (session.isPresent()) {
       List<String> listOfAttendees = datastoreClient.getListOfAttendeesInSession(sessionId);
       Gson gson = new Gson();

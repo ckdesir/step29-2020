@@ -23,7 +23,7 @@ public class PassControllerServlet extends HttpServlet {
     String sessionId =
         URLDecoder.decode(request.getParameter("session-id"), StandardCharsets.UTF_8);
     String name = URLDecoder.decode(request.getParameter("name"), StandardCharsets.UTF_8);
-    Optional<Session> session = datastoreClient.getSession(sessionId);
+    Optional<SessionInterface> session = datastoreClient.getSession(sessionId);
     if(session.isPresent()) {
       SessionInterface updatedSession =
           new Session(sessionId, Optional.of(name), session.get().getIpOfVM());
