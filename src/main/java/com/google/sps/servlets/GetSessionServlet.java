@@ -1,11 +1,18 @@
 package com.google.sps.servlets;
 
-import com.google.sps.data.DatastoreManager;
-import com.google.sps.data.DatastoreManagerInterface;
+import com.google.sps.data.Attendee;
+import com.google.sps.data.AttendeeInterface;
+import com.google.sps.data.DatastoreClient;
+import com.google.sps.data.DatastoreClientInterface;
+import com.google.sps.data.Session;
+import com.google.sps.data.SessionInterface;
 import com.google.gson.*;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.Date;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,18 +24,25 @@ public class GetSessionServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    DatastoreManagerInterface datastoreManager = new DatastoreManager();
+    DatastoreClientInterface datastoreClient = new DatastoreClient();
     String sessionId =
         URLDecoder.decode(request.getParameter("session-id"), StandardCharsets.UTF_8);
     String name = URLDecoder.decode(request.getParameter("name"), StandardCharsets.UTF_8);
-    Session session = datastoreManager.getSession(sessionId);
-    datastoreManager.updateAttendee(name, sessionId);
-    List<String> listOfAttendees = datastoreManager.getListOfAttendeesInSession(sessionId);
-    Gson gson = new Gson();
-    JsonElement jsonElement = gson.toJsonTree(session);
-    jsonElement.getAsJsonObject().addProperty("listOfAttendees", gson.toJson(listOfAttendees));
-    String json = gson.toJson(jsonElement);
-    response.setContentType("application/json;");
-    response.getWriter().println(json);
+    AttendeeInterface updatedAttendee = new Attendee(sessionId, name, new Date());
+    SessionInterface updatedSession =
+        new Session(sessionId, Optional.of(name), datastoreClient.getIpOfVM(sessionId));
+    datastoreClient.insertOrUpdateAttendee(updatedAttendee);
+    datastoreClient.insertOrUpdateSession(updatedSession);
+    Optional<String> session = datastoreClient.getSession(sessionId);
+    if (session.isPresent()) {
+      datastoreClient.updateAttendee(name, sessionId);
+      List<String> listOfAttendees = datastoreClient.getListOfAttendeesInSession(sessionId);
+      Gson gson = new Gson();
+      JsonElement jsonElement = gson.toJsonTree(session.get());
+      jsonElement.getAsJsonObject().addProperty("listOfAttendees", gson.toJson(listOfAttendees));
+      String json = gson.toJson(jsonElement);
+      response.setContentType("application/json;");
+      response.getWriter().println(json);
+    }
   }
 }
