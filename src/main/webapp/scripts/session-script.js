@@ -1,7 +1,7 @@
 // RFB holds the API to connect and communicate with a VNC server   
-import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
+//import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
 import { ServerClient } from './serverclient';
-import { Session } from './session'
+import { Session } from './Session'
 
 /**
  * Represents (in miliseconds) the cadence at which the UI is updated
@@ -43,11 +43,13 @@ window.onload = function() { main(); }
  * function main() connects the client to a session and begins many of
  * the behind the scenes operations, like caching.
  */
-function main() {
+async function main() {
   client.start();
-  changeToReadOnly();
-  remoteToSession();
-  updateUI();
+  client.getSession().then(session => {
+    changeToReadOnly(session.getSessionId());
+    remoteToSession(session.getIpOfVM());
+    updateUI();
+  })
 }
 
 /**
@@ -55,18 +57,17 @@ function main() {
  * (one on the welcome message) and the other in the session 
  * information div to show the session ID and then changes them
  * to read only.
+ * @param {string} sessionId
  */
-function changeToReadOnly() {
-  client.getSession().then(session => {
-    const /** HTMLElement */ sessionInfoInput = 
-    document.getElementById('session-info-input');
-    sessionInfoInput.value = session.getSessionId();
-    sessionInfoInput.readOnly = true;
-    const /** HTMLElement */ welcomeMessageInput = 
-        document.getElementById('welcome-message-input');
-    welcomeMessageInput.value = session.getSessionId();
-    welcomeMessageInput.readOnly = true;
-  });
+function changeToReadOnly(sessionId) {
+  const /** HTMLElement */ sessionInfoInput = 
+  document.getElementById('session-info-input');
+  sessionInfoInput.value = sessionId
+  sessionInfoInput.readOnly = true;
+  const /** HTMLElement */ welcomeMessageInput = 
+      document.getElementById('welcome-message-input');
+  welcomeMessageInput.value = sessionId;
+  welcomeMessageInput.readOnly = true;
 }
 
 /**
@@ -129,11 +130,13 @@ function updateController() {
  * with information on the new controller.
  * @param {MouseEvent} event
  */
-function passController(event) {
+async function passController(event) {
+  let session = await client.getSession();
   client.getSession().then(session => {
     if (urlParameters.get('name') === 
       session.getScreenNameOfController()) {
-        sessionScreen.viewOnly = true;
+        //sessionScreen.viewOnly = true;
+        console.log(event.target.parentElement.querySelector('h3').id);
         client.passController(
             event.target.parentElement.querySelector('h3').id);
       }

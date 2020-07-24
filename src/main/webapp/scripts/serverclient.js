@@ -40,6 +40,8 @@ class ServerClient {
      * @private {URLSearchParams}
      */
     this.urlParams_ = urlParams;
+
+    this.startSessionCache_();
   }
 
   /** 
@@ -47,7 +49,7 @@ class ServerClient {
    * @private
    */
   startSessionCache_() {
-    throw new Error('Unimplemented');
+    this.sessionCache_.start();
   }
 
   /**
@@ -56,7 +58,16 @@ class ServerClient {
    * @param {string} name 
    */
   passController(name) {
-    throw new Error('Unimplemented');
+    const /** string */ sessionID = 
+        encodeURI(this.urlParams_.get('session-id'));
+    const /** Request */ request = new Request('/pass-controller', {
+      method: 'POST',
+      body: JSON.stringify({
+        "name": encodeURI(name),
+        "session-id": sessionID
+      })
+    });
+    fetch(request);
   }
 
   /**
@@ -65,7 +76,7 @@ class ServerClient {
    * @return {Promise} The Promise object
    */
   getSession() {
-    throw new Error('Unimplemented');
+    return this.sessionCache_.getSession();
   }
 }
 

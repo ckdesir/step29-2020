@@ -1,6 +1,7 @@
 import * as sessionscript from './session-script';
-import { Session } from './session';
+import { Session } from './Session';
 import { ServerClient } from './serverclient';
+import fetch from 'jest-fetch-mock';
 
 afterEach(() => {    
   jest.clearAllMocks();
@@ -95,8 +96,12 @@ test('Tests to see if controller updates correctly UI wise', () => {
           backgroundColor).toEqual('rgb(255, 255, 255)');
 });
 
-test('tests changeToReadOnly()', () => {
+test('tests changeToReadOnly()', async () => {
   document.body.innerHTML = '';
+  const clientSpy = 
+      jest.spyOn(ServerClient.prototype, 'getSession').
+          mockResolvedValue(new Session(
+              'leee3414123', '1234', [], 'Bryan'));
   const sessionSpy = 
       jest.spyOn(Session.prototype, 'getSessionId').
           mockReturnValue('1eee3414123');
@@ -104,20 +109,26 @@ test('tests changeToReadOnly()', () => {
   sessionInfoInput.id = 'session-info-input';
   const welcomeMessageInput = document.createElement('input');
   welcomeMessageInput.id = 'welcome-message-input';
-  sessionscript.changeToReadOnly();
+  document.body.appendChild(sessionInfoInput);
+  document.body.appendChild(welcomeMessageInput);
+  await sessionscript.changeToReadOnly();
   expect(sessionInfoInput.readOnly).toBe(true);
   expect(welcomeMessageInput.readOnly).toBe(true);
   expect(sessionInfoInput.value).toEqual('1eee3414123');
   expect(welcomeMessageInput.value).toEqual('1eee3414123');
 });
 
-test('tests passController() - controller clicks', () => {
+test.only('tests passController() - controller clicks', async () => {
   const urlParamSpy = 
       jest.spyOn(window.URLSearchParams.prototype, 'get').
           mockReturnValue('Jessica');
   const sessionSpy = 
       jest.spyOn(Session.prototype, 'getScreenNameOfController').
           mockReturnValue('Jessica');
+  const clientSpy = 
+      jest.spyOn(ServerClient.prototype, 'getSession').
+          mockResolvedValue(new Session(
+              'leee3414123', '1234', ['Jessica', 'Naomi'], 'Jessica'));
   const passControllerSpy = 
       jest.spyOn(ServerClient.prototype, 'passController');
   const attendeeDiv = document.createElement('div');
@@ -126,7 +137,7 @@ test('tests passController() - controller clicks', () => {
       document.createElement('span');
   controllerToggle.className = 'controller-toggle';
   controllerToggle.addEventListener('click', 
-      sessionscript.passController, false);
+      await sessionscript.passController, false);
   const attendeeName =
       document.createElement('h3');
   attendeeName.innerHTML = 'Naomi';
@@ -135,7 +146,8 @@ test('tests passController() - controller clicks', () => {
   attendeeDiv.appendChild(controllerToggle);
   attendeeDiv.appendChild(attendeeName);
   controllerToggle.click();
-  expect(passControllerSpy).toBeCalledWith('Naomi');
+  console.log('hello');
+  await expect(passControllerSpy).toBeCalledWith('Naomi');
 });
 
 test('tests passController() - controller does not click', () => {
