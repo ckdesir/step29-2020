@@ -1,5 +1,5 @@
 // RFB holds the API to connect and communicate with a VNC server   
-//import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
+import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
 import { ServerClient } from './serverclient';
 import { Session } from './Session'
 
@@ -73,18 +73,17 @@ function changeToReadOnly(sessionId) {
 /**
  * function remoteToSession() uses the noVNC library
  * in order to connect to a session.
+ * @param {string} ipOfVM
  */
-function remoteToSession() {
-  client.getSession().then(session => {
-    const /** string */ url =
-      `wss://${session.getIpOfVM()}:6080`;
-    sessionScreen = new RFB(document.getElementById('session-screen'), url,
-        { credentials: { password: 'session' } });
-    sessionScreen.addEventListener('connect', connectedToServer);
-    sessionScreen.addEventListener('disconnect', disconnectedFromServer);
-    sessionScreen.viewOnly = true;
-    document.getElementById('welcome-message').style.display = 'block';
-  });
+function remoteToSession(ipOfVM) {
+  const /** string */ url =
+    `wss://${ipOfVM}:6080`;
+  sessionScreen = new RFB(document.getElementById('session-screen'), url,
+      { credentials: { password: 'session' } });
+  sessionScreen.addEventListener('connect', connectedToServer);
+  sessionScreen.addEventListener('disconnect', disconnectedFromServer);
+  sessionScreen.viewOnly = true;
+  document.getElementById('welcome-message').style.display = 'block';
 }
 
 /**
@@ -93,9 +92,10 @@ function remoteToSession() {
  * whoever the controller is.
  */
 function updateUI() {
-  updateController();
-  setTimeout(() => {
-    updateUI();
+  setInterval(() => {
+    client.getSession().then(session => {
+      updateController(session.getScreenNameOfController());
+    });
   }, UPDATE_UI_CADENCE_MS);
 }
 
@@ -103,25 +103,22 @@ function updateUI() {
  * function updateController() checks to see if the current user should
  * be the controller of their party, changing session screen privilege
  * and updating user interface.
+ * @param {string} controller
  */
-function updateController() {
-  client.getSession().then(session => {
-    const /** HTMLElement */ sessionInfoAttendeesDiv =
-        document.getElementById('session-info-attendees');
-    const /** NodeListOf<HTMLSpanElement> */ controllerToggleList = 
-        sessionInfoAttendeesDiv.querySelectorAll('span');
-    if (urlParameters.get('name') === 
-      session.getScreenNameOfController()) {
-        sessionScreen.viewOnly = false;
-      }
-    controllerToggleList.forEach(function(individualSpanElement) {
-      individualSpanElement.style.backgroundColor = '#fff';
-    });
-    sessionInfoAttendeesDiv.querySelector(`#${session.
-        getScreenNameOfController()}`)
-            .parentElement.querySelector('span').style.
-                backgroundColor = '#fd5d00';
+function updateController(controller) {
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
+  const /** NodeListOf<HTMLSpanElement> */ controllerToggleList = 
+      sessionInfoAttendeesDiv.querySelectorAll('span');
+  if (urlParameters.get('name') === controller) {
+    sessionScreen.viewOnly = false;
+  }
+  controllerToggleList.forEach(individualSpanElement => {
+    individualSpanElement.style.backgroundColor = '#fff';
   });
+  sessionInfoAttendeesDiv.querySelector(`#${controller}`)
+          .parentElement.querySelector('span').style.
+              backgroundColor = '#fd5d00';
 }
 
 /**
@@ -129,18 +126,14 @@ function updateController() {
  * toggle, their controller status is revoked and the server is updated
  * with information on the new controller.
  * @param {MouseEvent} event
+ * @param {string} controller
  */
-async function passController(event) {
-  let session = await client.getSession();
-  client.getSession().then(session => {
-    if (urlParameters.get('name') === 
-      session.getScreenNameOfController()) {
-        //sessionScreen.viewOnly = true;
-        console.log(event.target.parentElement.querySelector('h3').id);
-        client.passController(
-            event.target.parentElement.querySelector('h3').id);
-      }
-  });
+function passController(event, controller) {
+  if (urlParameters.get('name') === controller) {
+    sessionScreen.viewOnly = true;
+    client.passController(
+        event.target.parentElement.querySelector('h3').id);
+  }
 }
 
 /**
