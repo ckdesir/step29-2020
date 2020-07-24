@@ -11,6 +11,19 @@ import { Session } from './Session'
 const UPDATE_UI_CADENCE_MS = 30000;
 
 /**
+ * Represents (in miliseconds) how long the message that alerts users
+ * of any membership changes in the session is displayed. 
+ * @type {number}
+ */
+const MESSAGE_DURATION_MS = 4000;
+
+/**
+ * An array of who is currently in the session.
+ * @type {Array}
+ */
+let currentAttendees = ['Jessica', 'Bryan'];
+
+/**
  * Represents the noVNC client object; the single connection to the 
  * VNC server.
  * @type {RFB}
@@ -94,9 +107,98 @@ function remoteToSession(ipOfVM) {
 function updateUI() {
   setInterval(() => {
     client.getSession().then(session => {
+      updateSessionInfoAttendees(session.getListOfAttendees(),
+          session.getScreenNameOfController());
       updateController(session.getScreenNameOfController());
     });
   }, UPDATE_UI_CADENCE_MS);
+}
+
+/**
+ * function updateSessionInfoAttendees() adds new attendees to the
+ * session to the session info attendee div. Also removes attendees 
+ * if they left the session. Alerts users of anyone who has left/entered.
+ * @param {Array} updatedAttendees array of new attendees
+ * @param {string} controller
+ */
+function updateSessionInfoAttendees(updatedAttendees, controller) {
+  const /** Array */ newAttendees = updatedAttendees.filter(attendee => {
+    return !currentAttendees.includes(attendee);
+  });
+  const /** Array */ attendeesThatHaveLeft = 
+      currentAttendees.filter(attendee => {
+        return !updatedAttendees.includes(attendee);
+  });
+  if (newAttendees.length > 0) {
+    let /** string */ displayMessage =
+        'The following people have joined the session: ';
+    displayMessage += newAttendees.join(', ');
+    if (attendeesThatHaveLeft.length > 0) {
+      displayMessage = 
+          displayMessage.substring(0, displayMessage.length-1) + 
+              '. The following people have left the session: ';
+      displayMessage += attendeesThatHaveLeft.join(', ');
+    }
+    notifyOfChangesToMembership(displayMessage);
+  } else if (newAttendees.length === 0 && attendeesThatHaveLeft.length 
+        > 0) {
+          let /** string */ displayMessage = 
+              'The following people have left the session: ';
+          displayMessage += attendeesThatHaveLeft.join(', ');
+          notifyOfChangesToMembership(displayMessage);
+        }
+  currentAttendees = updatedAttendees;
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
+  sessionInfoAttendeesDiv.innerHTML = '';
+  currentAttendees.forEach(name => {
+    buildAttendeeDiv(name, controller);
+  });
+}
+
+/**
+ * function notifyOfChangesToMembership() notifies 
+ * users the message that's passed in.
+ * @param {string} displayMessage message to display to users
+ */
+function notifyOfChangesToMembership(displayMessage) {
+  console.log(displayMessage);
+  displayMessage = `${displayMessage.
+      substring(0, displayMessage.length-1)}.`;
+  const alertMembershipDiv = document.getElementById('alert-membership');
+  alertMembershipDiv.textContent = displayMessage;
+  alertMembershipDiv.className = 'display-message';
+  setTimeout(() => { 
+    alertMembershipDiv.className = ''; 
+  }, MESSAGE_DURATION_MS);
+}
+
+/**
+ * function buildAttendeeDiv() adds the div element containing
+ * all the elements representing an attendee to the session info
+ * attendees div.
+ * @param {string} nameOfAttendee name of attendee to build
+ * @param {string} controller
+ */
+function buildAttendeeDiv(nameOfAttendee, controller) {
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
+  const /** HTMLDivElement */ attendeeDiv = document.createElement('div');
+  attendeeDiv.className = 'attendee-div'
+  const /** HTMLSpanElement */ controllerToggle = 
+      document.createElement('span');
+  controllerToggle.className = 'controller-toggle';
+  controllerToggle.addEventListener('click', event => {
+    passController(event, controller);
+  }, /**AddEventListenerOptions=*/false);
+  const /** HTMLHeadingElement */ attendeeName =
+      document.createElement('h3');
+  attendeeName.innerHTML = nameOfAttendee;
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = nameOfAttendee;
+  attendeeDiv.appendChild(controllerToggle);
+  attendeeDiv.appendChild(attendeeName);
+  sessionInfoAttendeesDiv.appendChild(attendeeDiv);
 }
 
 /**
@@ -180,4 +282,5 @@ function disconnectedFromServer() {
 
 export { openSessionInfo, closeDisplay, copyTextToClipboard,  
   updateController, remoteToSession, passController,
-  connectedToServer, disconnectedFromServer, changeToReadOnly };
+  connectedToServer, disconnectedFromServer, changeToReadOnly, 
+  buildAttendeeDiv, updateSessionInfoAttendees };

@@ -3,6 +3,12 @@ import { Session } from './Session';
 import { ServerClient } from './serverclient';
 import fetch from 'jest-fetch-mock';
 
+const buildAttendeeDivSpy =
+    jest.spyOn(sessionscript.sessionScriptSpies, 'buildAttendeeDiv');
+const notifyOfChangesToMembershipSpy =
+    jest.spyOn(sessionscript.sessionScriptSpies,
+        'notifyOfChangesToMembership');
+
 afterEach(() => {    
   jest.clearAllMocks();
 });
@@ -69,15 +75,40 @@ test('tests copy and paste', () => {
   expect(document.execCommand).toHaveBeenCalledWith('copy');
 });
 
+test('adding an attendee div', () => {
+  document.body.innerHTML = '';
+  const sessionInfoAttendeeDiv =
+      document.createElement('div');
+  sessionInfoAttendeeDiv.id = 'session-info-attendees';
+  document.body.appendChild(sessionInfoAttendeeDiv);
+  const attendeeDivExpected = document.createElement('div');
+  attendeeDivExpected.className = 'attendee-div'
+  const controllerToggle = 
+      document.createElement('span');
+  controllerToggle.className = 'controller-toggle';
+  controllerToggle.addEventListener('click', event => {
+    sessionscript.changeController(event, 'Bryan');
+  }, false);  
+  const attendeeName = document.createElement('h3');
+  attendeeName.innerHTML = 'hello';
+  attendeeName.className = 'attendee-name'
+  attendeeName.id = 'hello';
+  attendeeDivExpected.appendChild(controllerToggle);
+  attendeeDivExpected.appendChild(attendeeName);
+  sessionscript.buildAttendeeDiv('hello', 'Bryan');
+  expect(sessionInfoAttendeeDiv.childNodes[0]).
+      toEqual(attendeeDivExpected);
+});
+
 test('Tests to see if controller updates correctly UI wise', () => {
   document.body.innerHTML = '';
   const sessionInfoAttendeeDiv =
       document.createElement('div');
   sessionInfoAttendeeDiv.id = 'session-info-attendees';
   document.body.appendChild(sessionInfoAttendeeDiv);
-  sessionscript.buildAttendeeDiv('Jessica');
-  sessionscript.buildAttendeeDiv('Bryan');
-  sessionscript.buildAttendeeDiv('Chris');
+  sessionscript.buildAttendeeDiv('Jessica', 'Jessica');
+  sessionscript.buildAttendeeDiv('Bryan', 'Jessica');
+  sessionscript.buildAttendeeDiv('Chris', 'Jessica');
   const urlParamSpy = 
       jest.spyOn(window.URLSearchParams.prototype, 'get').
           mockReturnValue('Jessica');
@@ -164,6 +195,89 @@ test('tests passController() - controller does not click', () => {
   attendeeDiv.appendChild(attendeeName);
   controllerToggle.click();
   expect(passControllerSpy).toBeCalledTimes(0);
+});
+
+test(`A new member 
+    -updateSessionInfoAttendees`, () => {
+      const expectedMessage =
+          `The following people have joined the session: ${'Miguel'} `;
+      document.body.innerHTML = '';
+      const sessionInfoAttendeeDiv =
+          document.createElement('div');
+      sessionInfoAttendeeDiv.id = 'session-info-attendees';
+      document.body.appendChild(sessionInfoAttendeeDiv);
+      const alertMembershipDiv =
+          document.createElement('div');
+      alertMembershipDiv.id = 'alert-membership';
+      document.body.appendChild(alertMembershipDiv);
+      sessionscript.updateSessionInfoAttendees(['Jessica', 'Bryan', 'Miguel'], 'Jessica');
+      expect(notifyOfChangesToMembershipSpy).
+          toHaveBeenCalledWith(expectedMessage);
+      expect(buildAttendeeDivSpy).toBeCalledTimes(3);
+      expect(buildAttendeeDivSpy).toHaveBeenCalledWith('Jessica', 'Jessica');
+      expect(buildAttendeeDivSpy).toHaveBeenCalledWith('Bryan', 'Jessica');
+      expect(buildAttendeeDivSpy).toHaveBeenCalledWith('Miguel', 'Jessica');
+});
+
+test(`A member that has left
+    -updateSessionInfoAttendees`, () => {
+      const expectedMessage =
+          `The following people have left the session: ${'Bryan'} `;
+      document.body.innerHTML = '';
+      const sessionInfoAttendeeDiv =
+          document.createElement('div');
+      sessionInfoAttendeeDiv.id = 'session-info-attendees';
+      document.body.appendChild(sessionInfoAttendeeDiv);
+      const alertMembershipDiv =
+          document.createElement('div');
+      alertMembershipDiv.id = 'alert-membership';
+      document.body.appendChild(alertMembershipDiv);
+      const sessionSpy = 
+          jest.spyOn(Session.prototype, 'getListOfAttendees').
+              mockReturnValue(['Jessica']);
+      sessionscript.updateSessionInfoAttendees(['Jessica'], 'Bryan');
+      expect(notifyOfChangesToMembershipSpy).
+         toHaveBeenCalledWith(expectedMessage);
+      expect(buildAttendeeDivSpy).toBeCalledTimes(1);
+      expect(buildAttendeeDivSpy).toHaveBeenCalledWith('Jessica', 'Bryan');
+
+    });
+
+test(`A new member + a lost member' + 
+    '-updateSessionInfoAttendees`, () => {
+      const expectedMessage =
+          'The following people have joined the session: ' + 'Miguel.' + 
+              ' The following people have left the session: ' + 'Bryan ';
+      document.body.innerHTML = '';
+      const sessionInfoAttendeeDiv =
+          document.createElement('div');
+      sessionInfoAttendeeDiv.id = 'session-info-attendees';
+      document.body.appendChild(sessionInfoAttendeeDiv);
+      const alertMembershipDiv =
+          document.createElement('div');
+      alertMembershipDiv.id = 'alert-membership';
+      document.body.appendChild(alertMembershipDiv);
+      const sessionSpy = 
+          jest.spyOn(Session.prototype, 'getListOfAttendees').
+              mockReturnValue(['Jessica', 'Miguel']);
+      sessionscript.updateSessionInfoAttendees(['Jessica', 'Miguel'], 'Jessica');
+      expect(notifyOfChangesToMembershipSpy).
+          toHaveBeenCalledWith(expectedMessage);
+      expect(buildAttendeeDivSpy).toBeCalledTimes(2);
+      expect(buildAttendeeDivSpy).toBeCalledWith('Jessica', 'Jessica');
+      expect(buildAttendeeDivSpy).toBeCalledWith('Miguel', 'Jessica');
+});
+
+test(`no update 
+    '-updateSessionInfoAttendees`, () => {
+      document.body.innerHTML = '';
+      const sessionInfoAttendeeDiv =
+          document.createElement('div');
+      sessionInfoAttendeeDiv.id = 'session-info-attendees';
+      document.body.appendChild(sessionInfoAttendeeDiv);
+      sessionscript.updateSessionInfoAttendees(['Jessica', 'Bryan'], 'Bryan');
+      expect(buildAttendeeDivSpy).toBeCalledWith('Jessica', 'Bryan');
+      expect(buildAttendeeDivSpy).toBeCalledWith('Bryan', 'Bryan');
 });
 
 test(`We can check if correct errors are thrown -
