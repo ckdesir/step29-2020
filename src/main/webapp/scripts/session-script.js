@@ -21,7 +21,7 @@ const MESSAGE_DURATION_MS = 4000;
  * An array of who is currently in the session.
  * @type {Array}
  */
-let currentAttendees = ['Jessica', 'Bryan'];
+let currentAttendees = [];
 
 /**
  * Represents the noVNC client object; the single connection to the 

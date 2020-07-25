@@ -197,6 +197,26 @@ test('tests passController() - controller does not click', () => {
   expect(passControllerSpy).toBeCalledTimes(0);
 });
 
+test(`makes sure notifyOfChangesToMembership is
+correctly displaying message`, (done) => {
+    const displayMessage = 'How are you ';
+    document.body.innerHTML = '';
+    const alertMembershipDiv =
+        document.createElement('div');
+    alertMembershipDiv.id = 'alert-membership';
+    document.body.appendChild(alertMembershipDiv);
+    sessionscript.notifyOfChangesToMembership(displayMessage);
+    setTimeout(() => {
+      expect(alertMembershipDiv.textContent).toEqual('How are you.');
+      expect(alertMembershipDiv.className).toEqual('display-message');
+      done();
+    }, 2000);
+    setTimeout(() => {
+      expect(alertMembershipDiv.className).toEqual('');
+      done();
+    }, 6000);
+});
+
 test(`A new member 
     -updateSessionInfoAttendees`, () => {
       const expectedMessage =
