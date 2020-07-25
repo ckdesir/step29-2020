@@ -57,12 +57,32 @@ window.onload = function() { main(); }
  * the behind the scenes operations, like caching.
  */
 function main() {
+  addOnClickToElements();
   client.start();
   client.getSession().then(session => {
     changeToReadOnly(session.getSessionId());
     remoteToSession(session.getIpOfVM());
     updateUI();
-  })
+  });
+}
+
+/**
+ * Adds an onclick event listener to some of the elements on the
+ * in-session webpage.
+ */
+function addOnClickToElements() {
+  document.getElementById('session-info-span').addEventListener('click', 
+      openSessionInfo);
+  document.querySelectorAll('.close').forEach(element => {
+    element.addEventListener('click', event => {
+      closeDisplay(event.target);
+    });
+  });
+  document.querySelectorAll('.session-id-field').forEach(element => {
+    element.addEventListener('click', event => {
+      copyTextToClipboard(event.target);
+    });
+  });
 }
 
 /**
@@ -75,7 +95,7 @@ function main() {
 function changeToReadOnly(sessionId) {
   const /** HTMLElement */ sessionInfoInput = 
   document.getElementById('session-info-input');
-  sessionInfoInput.value = sessionId
+  sessionInfoInput.value = sessionId;
   sessionInfoInput.readOnly = true;
   const /** HTMLElement */ welcomeMessageInput = 
       document.getElementById('welcome-message-input');
@@ -87,10 +107,10 @@ function changeToReadOnly(sessionId) {
  * function remoteToSession() uses the noVNC library
  * in order to connect to a session.
  * @param {string} ipOfVM
+ * @param {string} sessionId
  */
 function remoteToSession(ipOfVM) {
-  const /** string */ url =
-    `wss://${ipOfVM}:6080`;
+  const /** string */ url = `wss://${ipOfVM}:6080`;
   sessionScreen = new RFB(document.getElementById('session-screen'), url,
       { credentials: { password: 'session' } });
   sessionScreen.addEventListener('connect', connectedToServer);
