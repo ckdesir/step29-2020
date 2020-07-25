@@ -25,7 +25,7 @@ class ServerClient {
       const /** string */ sessionID = 
           encodeURI(urlParams.get('session-id'));
       const /** Response */ response = await fetch(
-          `/get-session-info?name=${name}&session-id=${sessionID}`);
+          `/get-session?name=${name}&session-id=${sessionID}`);
       return await response.json();
     }
 
