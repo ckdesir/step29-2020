@@ -56,7 +56,7 @@ window.onload = function() { main(); }
  * function main() connects the client to a session and begins many of
  * the behind the scenes operations, like caching.
  */
-async function main() {
+function main() {
   client.start();
   client.getSession().then(session => {
     changeToReadOnly(session.getSessionId());
