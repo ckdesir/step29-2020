@@ -1,4 +1,4 @@
-import { SessionCache } from './sessioncache';
+import { SessionCache } from './sessioncache.js';
 
 /**
  * ServerClient is responsible for keeping up-to-date with the current 

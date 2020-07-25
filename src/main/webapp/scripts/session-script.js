@@ -1,7 +1,7 @@
 // RFB holds the API to connect and communicate with a VNC server   
 import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
-import { ServerClient } from './serverclient';
-import { Session } from './Session'
+import { ServerClient } from './serverclient.js';
+import { Session } from './Session.js'
 
 /**
  * Represents (in miliseconds) the cadence at which the UI is updated
