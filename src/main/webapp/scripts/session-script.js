@@ -77,7 +77,7 @@ function addOnClickToElements() {
       closeDisplay(event.target);
     });
   });
-  document.querySelectorAll('.session-id-field').forEach(element => {
+  document.querySelectorAll('.session-id-input').forEach(element => {
     element.addEventListener('click', event => {
       copyTextToClipboard(event.target);
     });
@@ -153,9 +153,7 @@ function updateSessionInfoAttendees(updatedAttendees, controller) {
         'The following people have joined the session: ';
     displayMessage += newAttendees.join(', ');
     if (attendeesThatHaveLeft.length > 0) {
-      displayMessage = 
-          displayMessage.substring(0, displayMessage.length-1) + 
-              '. The following people have left the session: ';
+      displayMessage += '. The following people have left the session: ';
       displayMessage += attendeesThatHaveLeft.join(', ');
     }
     notifyOfChangesToMembership(displayMessage);
@@ -181,9 +179,7 @@ function updateSessionInfoAttendees(updatedAttendees, controller) {
  * @param {string} displayMessage message to display to users
  */
 function notifyOfChangesToMembership(displayMessage) {
-  console.log(displayMessage);
-  displayMessage = `${displayMessage.
-      substring(0, displayMessage.length-1)}.`;
+  displayMessage += '.';
   const alertMembershipDiv = document.getElementById('alert-membership');
   alertMembershipDiv.textContent = displayMessage;
   alertMembershipDiv.className = 'display-message';
