@@ -3,17 +3,30 @@
   <meta charset="UTF-8"/>
   <title>VMN</title>
   <link rel="stylesheet" href="styles/session-style.css"/>
-  <script src="scripts/session-script.js"></script>
+  <script type="module" src="scripts/session.js"></script>
+  <script type="module" src="scripts/sessioncache.js"></script>
+  <script type="module" src="scripts/session-script.js"></script>
   <div id="header-bar">
     <h1 class="center-text">Virtual Movie Night</h1>
     <span 
         id="session-info-span" onclick="openSessionInfo()">
         <span id="session-info-span-text"><b>Session Info</b></span></span>
   </div>
+  <div id="welcome-message">
+    <span class="close" onclick="closeDisplay(this)">X</span>
+    <p>Thank you for using Virtual Movie Night! 
+      Share the Session ID below with other party goers
+      to get the party started!
+    </p>
+    <label class="session-id-label" for="welcome-message-field">Session-ID:
+    </label>
+    <input type="text" class="session-id-field" id="welcome-message-field" 
+        name="session-id" onclick="copyTextToClipboard(this)">
+  </div>
   <div id="session-status" class="center-text">Connecting...</div>
   <div id="session-screen"></div>
   <div id="session-info-div">
-    <span id="close" onclick="closeSessionInfo()">X</span>
+    <span class="close" onclick="closeDisplay(this)">X</span>
     <div id="session-id-div">
       <label class="session-id-label" for="session-info-field">Session-ID:
       </label>
