@@ -58,7 +58,6 @@ window.onload = function() { main(); }
  */
 function main() {
   addOnClickToElements();
-  client.start();
   client.getSession().then(session => {
     changeToReadOnly(session.getSessionId());
     remoteToSession(session.getIpOfVM());
