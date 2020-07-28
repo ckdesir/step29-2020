@@ -1,3 +1,5 @@
+package com.google.sps.data;
+
 /** Class that creates constants for tables. **/
 public final class EntityConstants {
 
@@ -13,6 +15,7 @@ public final class EntityConstants {
   public final static class InstanceEntity {
     public final static String TABLE_NAME = "Instance";
     public final static String INSTANCE_NAME = "InstanceName";
+    public final static String STATE = "State";
     public final static String SESSION_ID = "SessionId";
   }
 
