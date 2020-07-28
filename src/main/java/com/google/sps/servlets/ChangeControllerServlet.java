@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /** Servlet that changes the controller of a Session. */
-@WebServlet("/pass-controller")
-public class PassControllerServlet extends HttpServlet {
+@WebServlet("/change-controller")
+public class ChangeControllerServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
