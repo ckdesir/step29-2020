@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,11 +23,17 @@ import com.google.sps.servlets.GetSessionServlet;
 import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Session.class)
 public class GetSessionServletTest {
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
@@ -55,10 +63,18 @@ public class GetSessionServletTest {
 
   @Test
   public void testDoGet() throws Exception {
-    // DatastoreClientInterface datastoreClient = mock(DatastoreClient.class);
+    DatastoreClientInterface datastoreClient = mock(DatastoreClient.class);
+    DatastoreService datastoreMock = mock(DatastoreService.class);
+    PreparedQuery pqMock = mock(PreparedQuery.class);
+    Session mockSession = mock(Session.class);
+    PowerMockito.mockStatic(Session.class);
     //AttendeeInterface attendee = mock(Attendee.class);
     Optional<Session> expectedSession =
         Optional.of(new Session("EEEEE7", Optional.of("Jessica"), Optional.of("12.34.56.78")));
+    when(pqMock.asSingleEntity()).thenReturn(expectedSession.get().toEntity());
+    // Mockito.doReturn(expectedSession.get()).when(Session.fromEntity(any()));
+    // //Session.fromEntity(any());
+    when(Session.fromEntity(expectedSession.get().toEntity())).thenReturn(expectedSession.get());
     List<String> listOfAttendees = Arrays.asList("Jessica", "Bradley", "Noel");
     doNothing().when(datastoreClient).insertOrUpdateAttendee(any());
     when(request.getParameter("session-id")).thenReturn("EEEEE7");

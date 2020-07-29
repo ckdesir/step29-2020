@@ -42,14 +42,15 @@ public class GetSessionServlet extends HttpServlet {
             jsonElement.getAsJsonObject().addProperty("listOfAttendees", gson.toJson(listOfAttendees.get()));
             String json = gson.toJson(jsonElement);
             response.setContentType("application/json;");
+            response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().println(json);
           }
         } catch (Exception e) {
-          e.printStackTrace();
+          throw NoAttendeesFoundException();
         }
       }  
     } catch (Exception e1) {
-      e1.printStackTrace();
+      throw NoSessionFoundException();
     }
   }
 }
