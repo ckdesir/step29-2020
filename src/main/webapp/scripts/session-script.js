@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * Represents (in miliseconds) the cadence at which the UI is updated
- * (if needed). 
+ * Represents (in miliseconds) the cadence at which the session is
+ * refreshed. 
  * @type {number}
  */
-const UPDATE_UI_CADENCE_MS = 30000;
+const SESSION_REFRESH_CADENCE_MS = 30000;
 
 /**
  * Represents (in miliseconds) how long the message that alerts users
@@ -72,7 +72,7 @@ function updateUI() {
       updateSessionInfoAttendees(session.getListOfAttendees(),
           session.getScreenNameOfController());
     });
-  }, UPDATE_UI_CADENCE_MS);
+  }, SESSION_REFRESH_CADENCE_MS);
 }
 
 /**
