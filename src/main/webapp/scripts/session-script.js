@@ -20,6 +20,25 @@
 const SESSION_REFRESH_CADENCE_MS = 30000;
 
 /**
+ * This waits until the webpage loads and then it calls the
+ * anonymous function, which calls main.
+ */
+window.onload = function() { main(); }
+
+/**
+ * function main() connects the client to a session and begins many of
+ * the behind the scenes operations, like caching.
+ */
+function main() {
+  client.getSession().then(session => {
+    remoteToSession(session.getIpOfVM(), session.getSessionId());
+    updateUI();
+  }).catch(error => {
+    window.alert(error);
+  });
+}
+
+/**
  * function updateUI() refreshes information client side, 
  * updating the UI in checking for new attendees and for
  * whoever the controller is.
@@ -29,22 +48,14 @@ function updateUI() {
     client.getSession().then(session => {
       updateController(session.getScreenNameOfController());
     });
-  }, UPDATE_UI_CADENCE_MS);
-}
-
-/**
- * function openSessionInfo() displays the div container
- * that has information about the session.
- */
-function openSessionInfo() {
-  document.getElementById('session-info-div').style.display = 'block'; 
+  }, SESSION_REFRESH_CADENCE_MS);
 }
 
 /**
  * function updateController() checks to see if the current user should
  * be the controller of their party, changing session screen privilege
  * and updating user interface.
- * @param {string} controller
+ * @param {string} controller controller of the current session
  */
 function updateController(controller) {
   const /** HTMLElement */ sessionInfoAttendeesDiv =
@@ -60,6 +71,14 @@ function updateController(controller) {
   sessionInfoAttendeesDiv.querySelector(`#${controller}`)
           .parentElement.querySelector('span').style.
               backgroundColor = '#fd5d00';
+}
+
+/**
+ * function openSessionInfo() displays the div container
+ * that has information about the session.
+ */
+function openSessionInfo() {
+  document.getElementById('session-info-div').style.display = 'block'; 
 }
 
 /**
