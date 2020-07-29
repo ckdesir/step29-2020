@@ -13,6 +13,47 @@
 // limitations under the License.
 
 /**
+ * function updateSessionInfoAttendees() adds new attendees to the
+ * session to the session info attendee div. Also removes attendees 
+ * if they left the session. Alerts users of anyone who has left/entered.
+ * @param {Array} updatedAttendees array of new attendees
+ * @param {string} controller
+ */
+function updateSessionInfoAttendees(updatedAttendees, controller) {
+  const /** Array */ newAttendees = updatedAttendees.filter(attendee => {
+    return !currentAttendees.includes(attendee);
+  });
+  const /** Array */ attendeesThatHaveLeft = 
+      currentAttendees.filter(attendee => {
+        return !updatedAttendees.includes(attendee);
+  });
+  if (newAttendees.length > 0) {
+    let /** string */ displayMessage =
+        'The following people have joined the session: ' +
+            newAttendees.join(', ');
+    if (attendeesThatHaveLeft.length > 0) {
+      displayMessage += 
+          '. The following people have left the session: ' +
+              attendeesThatHaveLeft.join(', ');
+    }
+    notifyOfChangesToMembership(displayMessage);
+  } else if (newAttendees.length === 0 && attendeesThatHaveLeft.length 
+        > 0) {
+          let /** string */ displayMessage = 
+              'The following people have left the session: ' + 
+                  attendeesThatHaveLeft.join(', ');
+          notifyOfChangesToMembership(displayMessage);
+        }
+  currentAttendees = updatedAttendees;
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
+  sessionInfoAttendeesDiv.innerHTML = '';
+  currentAttendees.forEach(name => {
+    buildAttendeeDiv(name, controller);
+  });
+}
+
+/**
  * function openSessionInfo() displays the div container
  * that has information about the session.
  */
