@@ -158,6 +158,8 @@ function copyTextToClipboard() {
   document.execCommand('copy');
 }
 
+export { openSessionInfo, closeSessionInfo, copyTextToClipboard, updateSessionInfoAttendees, notifyOfChangesToMembership };
+
 module.exports = {
   openSessionInfo: openSessionInfo,
   closeSessionInfo: closeSessionInfo,
