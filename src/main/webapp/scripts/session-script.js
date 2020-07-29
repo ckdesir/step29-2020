@@ -13,11 +13,53 @@
 // limitations under the License.
 
 /**
+ * Represents (in miliseconds) the cadence at which the session is
+ * refreshed. 
+ * @type {number}
+ */
+const SESSION_REFRESH_CADENCE_MS = 30000;
+
+/**
+ * function updateUI() refreshes information client side, 
+ * updating the UI in checking for new attendees and for
+ * whoever the controller is.
+ */
+function updateUI() {
+  setInterval(() => {
+    client.getSession().then(session => {
+      updateController(session.getScreenNameOfController());
+    });
+  }, UPDATE_UI_CADENCE_MS);
+}
+
+/**
  * function openSessionInfo() displays the div container
  * that has information about the session.
  */
 function openSessionInfo() {
   document.getElementById('session-info-div').style.display = 'block'; 
+}
+
+/**
+ * function updateController() checks to see if the current user should
+ * be the controller of their party, changing session screen privilege
+ * and updating user interface.
+ * @param {string} controller
+ */
+function updateController(controller) {
+  const /** HTMLElement */ sessionInfoAttendeesDiv =
+      document.getElementById('session-info-attendees');
+  const /** NodeListOf<HTMLSpanElement> */ controllerToggleList = 
+      sessionInfoAttendeesDiv.querySelectorAll('span');
+  if (urlParameters.get('name') === controller) {
+    sessionScreen.viewOnly = false;
+  }
+  controllerToggleList.forEach(individualSpanElement => {
+    individualSpanElement.style.backgroundColor = '#fff';
+  });
+  sessionInfoAttendeesDiv.querySelector(`#${controller}`)
+          .parentElement.querySelector('span').style.
+              backgroundColor = '#fd5d00';
 }
 
 /**
