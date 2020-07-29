@@ -118,13 +118,17 @@ test(`A new member
           document.createElement('div');
       alertMembershipDiv.id = 'alert-membership';
       document.body.appendChild(alertMembershipDiv);
-      sessionscript.updateSessionInfoAttendees(['Jessica', 'Bryan', 'Miguel'], 'Jessica');
+      sessionscript.updateSessionInfoAttendees(
+          ['Jessica', 'Bryan', 'Miguel'], 'Jessica');
       expect(notifyOfChangesToMembershipSpy).
           toHaveBeenCalledWith(expectedMessage);
       expect(buildAttendeeDivSpy).toBeCalledTimes(3);
-      expect(buildAttendeeDivSpy).toHaveBeenCalledWith('Jessica', 'Jessica');
-      expect(buildAttendeeDivSpy).toHaveBeenCalledWith('Bryan', 'Jessica');
-      expect(buildAttendeeDivSpy).toHaveBeenCalledWith('Miguel', 'Jessica');
+      expect(buildAttendeeDivSpy).
+          toHaveBeenCalledWith('Jessica', 'Jessica');
+      expect(buildAttendeeDivSpy).
+          toHaveBeenCalledWith('Bryan', 'Jessica');
+      expect(buildAttendeeDivSpy).
+          toHaveBeenCalledWith('Miguel', 'Jessica');
 });
 
 test(`A member that has left
@@ -148,8 +152,7 @@ test(`A member that has left
          toHaveBeenCalledWith(expectedMessage);
       expect(buildAttendeeDivSpy).toBeCalledTimes(1);
       expect(buildAttendeeDivSpy).toHaveBeenCalledWith('Jessica', 'Bryan');
-
-    });
+});
 
 test(`A new member + a lost member' + 
     '-updateSessionInfoAttendees`, () => {
@@ -168,7 +171,8 @@ test(`A new member + a lost member' +
       const sessionSpy = 
           jest.spyOn(Session.prototype, 'getListOfAttendees').
               mockReturnValue(['Jessica', 'Miguel']);
-      sessionscript.updateSessionInfoAttendees(['Jessica', 'Miguel'], 'Jessica');
+      sessionscript.updateSessionInfoAttendees(
+          ['Jessica', 'Miguel'], 'Jessica');
       expect(notifyOfChangesToMembershipSpy).
           toHaveBeenCalledWith(expectedMessage);
       expect(buildAttendeeDivSpy).toBeCalledTimes(2);
@@ -183,7 +187,8 @@ test(`no update
           document.createElement('div');
       sessionInfoAttendeeDiv.id = 'session-info-attendees';
       document.body.appendChild(sessionInfoAttendeeDiv);
-      sessionscript.updateSessionInfoAttendees(['Jessica', 'Bryan'], 'Bryan');
+      sessionscript.updateSessionInfoAttendees(
+          ['Jessica', 'Bryan'], 'Bryan');
       expect(buildAttendeeDivSpy).toBeCalledWith('Jessica', 'Bryan');
       expect(buildAttendeeDivSpy).toBeCalledWith('Bryan', 'Bryan');
 });
