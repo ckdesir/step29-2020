@@ -13,6 +13,69 @@
 // limitations under the License.
 
 /**
+ * Represents (in miliseconds) the cadence at which the UI is updated
+ * (if needed). 
+ * @type {number}
+ */
+const UPDATE_UI_CADENCE_MS = 30000;
+
+/**
+ * Represents (in miliseconds) how long the message that alerts users
+ * of any membership changes in the session is displayed. 
+ * @type {number}
+ */
+const MESSAGE_DURATION_MS = 4000;
+
+/**
+ * Represents the URLSearchParams of the
+ * the client is in, holds information such as the
+ * session ID and the screen name of the current user.
+ * @type {URLSearchParams}
+ */
+const urlParameters = new URLSearchParams(window.location.search);
+
+/**
+ * Represents the ServerClient object responsible for
+ * keeping up-to-date with the current session and handles many
+ * of the client-to-server interactions, like passing the controller.
+ * @type {ServerClient}
+ */
+const client = new ServerClient(urlParameters);
+
+/**
+ * This waits until the webpage loads and then it calls the
+ * anonymous function, which calls main.
+ */
+window.onload = function() { main(); }
+
+/**
+ * function main() connects the client to a session and begins many of
+ * the behind the scenes operations, like caching.
+ */
+function main() {
+  client.getSession().then(session => {
+    remoteToSession(session.getIpOfVM(), session.getSessionId());
+    updateUI();
+  }).catch(error => {
+    window.alert(error);
+  });
+}
+
+/**
+ * function updateUI() refreshes information client side, 
+ * updating the UI in checking for new attendees and for
+ * whoever the controller is.
+ */
+function updateUI() {
+  setInterval(() => {
+    client.getSession().then(session => {
+      updateSessionInfoAttendees(session.getListOfAttendees(),
+          session.getScreenNameOfController());
+    });
+  }, UPDATE_UI_CADENCE_MS);
+}
+
+/**
  * function updateSessionInfoAttendees() adds new attendees to the
  * session to the session info attendee div. Also removes attendees 
  * if they left the session. Alerts users of anyone who has left/entered.
@@ -51,6 +114,21 @@ function updateSessionInfoAttendees(updatedAttendees, controller) {
   currentAttendees.forEach(name => {
     buildAttendeeDiv(name, controller);
   });
+}
+
+/**
+ * function notifyOfChangesToMembership() notifies 
+ * users the message that's passed in.
+ * @param {string} displayMessage message to display to users
+ */
+function notifyOfChangesToMembership(displayMessage) {
+  displayMessage += '.';
+  const alertMembershipDiv = document.getElementById('alert-membership');
+  alertMembershipDiv.textContent = displayMessage;
+  alertMembershipDiv.className = 'display-message';
+  setTimeout(() => { 
+    alertMembershipDiv.className = ''; 
+  }, MESSAGE_DURATION_MS);
 }
 
 /**
