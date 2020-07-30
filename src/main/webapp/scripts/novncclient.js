@@ -1,7 +1,17 @@
 import { ServerClient } from './serverclient.js';
 import RFB from 'https://cdn.jsdelivr.net/npm/@novnc/novnc@1.1.0/core/rfb.js';
 
-class novncClient {
+class noVNCClient {
+  /**
+   * Initalizes a noVNCClient object.
+   * @param {ServerClient} serverClient Represents the ServerClient object 
+   *    responsible for keeping up-to-date with the current session and
+   *    handles many of the client-to-server interactions, 
+   *    like passing the controller.
+   * @param {number=} [reconnectCadence = 30000] Represents the rate at 
+   *    which the noVNC RFB object attempts to reconnect if it goes down.
+   *    By default, is 30,000 milliseconds
+   */
   constructor(serverClient, reconnectCadence = 30000) {
     /**
      * Represents the current noVNC RFB object of the 
@@ -12,17 +22,11 @@ class novncClient {
     this.sessionScreen_ = null; 
 
     /**
-     * Represents the rate at which the noVNC RFB object
-     * attempts to reconnect if it goes down.
      * @private {number}
-     * @const
      */
-    this.RECONNECT_CADENCE_MS_ = reconnectCadence;
+    this.reconnectCadenceMS_ = reconnectCadence;
 
     /**
-     * Represents the ServerClient object responsible for
-     * keeping up-to-date with the current session and handles many
-     * of the client-to-server interactions, like passing the controller.
      * @private {ServerClient}
      */
     this.serverClient_ = serverClient;
@@ -34,7 +38,7 @@ class novncClient {
      */
     this.isConnected_ = false;
 
-    this.remoteToSession_;
+    this.remoteToSession_();
   }
 
   /**
