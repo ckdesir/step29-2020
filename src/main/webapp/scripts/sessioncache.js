@@ -1,5 +1,5 @@
-import { Poller } from './poller';
-import { Session } from './session';
+import { Poller } from './poller.js';
+import { Session } from './session.js';
 
 /** 
  * SessionCache bridges the gap between the client and server.

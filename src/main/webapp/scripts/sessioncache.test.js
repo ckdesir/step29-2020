@@ -1,16 +1,16 @@
 import { SessionCache } from './sessioncache';
-import { Session } from './session';
+import { Session } from './session.js';
 import fetch from 'jest-fetch-mock';
 
 fetch.enableMocks();
 jest.setTimeout(40000);
 
-const expectedResult = Session.fromObject({
-  sessionID: 'EEEE7',
-  controller: 'chris',
+const expectedResult = {
+  sessionId: 'EEEE7',
   ipOfVM: '1.2.3.4.5.6.7',
+  screenNameOfController: 'chris',
   listOfAttendes: ['chris', 'bryan']
-});
+};
 
 afterEach(() => {    
   jest.clearAllMocks();
@@ -24,7 +24,7 @@ test('Test to see if stop is working correctly!', (done) => {
   setTimeout(async () => {
     cache.stop();
     await expect(cache.getSession()).
-        resolves.toEqual(expectedResult);
+        resolves.toEqual(Session.fromObject(expectedResult));
     done();
   }, 30000);
 });
@@ -35,7 +35,7 @@ test('Checks continuation of refreshing - no stop', (done) => {
   cache.start();
   setTimeout(async () => {
     await expect(cache.getSession()).
-        resolves.toEqual(expectedResult);
+        resolves.toEqual(Session.fromObject(expectedResult));
     done();
   }, 5000);
 });
@@ -54,7 +54,7 @@ test('starting up, immediately stopping', async () => {
   cache.start();
   cache.stop();
   await expect(cache.getSession()).
-      resolves.toEqual(expectedResult);
+      resolves.toEqual(Session.fromObject(expectedResult));
 });
 
 test('starting up after stopping', (done) => {
@@ -65,7 +65,7 @@ test('starting up after stopping', (done) => {
   cache.start();
   setTimeout(async () => {
     await expect(cache.getSession()).
-        resolves.toEqual(expectedResult); 
+        resolves.toEqual(Session.fromObject(expectedResult)); 
     done();
   }, 5000);
 });
@@ -75,7 +75,7 @@ test('retrieving info after starting immediately', async () => {
   const cache = new SessionCache(testSessionRequest, 1000);
   cache.start();
   await expect(cache.getSession()).
-      resolves.toEqual(expectedResult);
+      resolves.toEqual(Session.fromObject(expectedResult));
 });
 
 async function testSessionRequest() {

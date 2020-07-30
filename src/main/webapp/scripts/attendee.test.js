@@ -1,4 +1,4 @@
-import { Attendee } from './Attendee';
+import { Attendee } from './attendee.js';
 
 test('Check for correct value of screenName', () => {
     const expectedScreenName = "Jaz";

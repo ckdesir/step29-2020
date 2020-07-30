@@ -1,9 +1,21 @@
-import { SessionCache } from './sessioncache';
+import { SessionCache } from './sessioncache.js';
+
+/**
+ * Specifies the URL pattern of the ChangeControllerServlet.
+ * @private @const
+ */
+const CHANGE_CONTROLLER_ENDPOINT_ = '/change-controller';
+
+/**
+ * Specifies the URL pattern of the GetSessionServlet.
+ * @private @const
+ */
+const GET_SESSION_ENDPOINT_ = '/get-session';
 
 /**
  * ServerClient is responsible for keeping up-to-date with the current 
  * session and handles many of the client-to-server interactions, 
- * like passing the controller.
+ * like changing the controller.
  */
 class ServerClient {
   /**
@@ -24,9 +36,10 @@ class ServerClient {
       const /** string */ name = encodeURI(urlParams.get('name'));
       const /** string */ sessionID = 
           encodeURI(urlParams.get('session-id'));
-      const /** Response */ response = await fetch(
-          `/get-session-info?name=${name}&session-id=${sessionID}`);
-      return await response.json();
+      const /** Response */ response =
+          await fetch(GET_SESSION_ENDPOINT_ + '?name=' +
+              name + '&session-id=' + sessionID);
+      return response.json();
     }
 
     /**
@@ -40,23 +53,32 @@ class ServerClient {
      * @private {URLSearchParams}
      */
     this.urlParams_ = urlParams;
-  }
 
-  /** 
-   * This method starts to cache.
-   * @private
-   */
-  startSessionCache_() {
-    throw new Error('Unimplemented');
+    this.sessionCache_.start();
   }
 
   /**
    * This method changes the controller of the current session to the 
-   * Attendee pased in.
-   * @param {string} name 
+   * Attendee passed in.
+   * @param {string} newControllerName 
    */
-  passController(name) {
-    throw new Error('Unimplemented');
+  changeControllerTo(newControllerName) {
+    const /** string */ sessionID = 
+        encodeURI(this.urlParams_.get('session-id'));
+    const /** Request */ request =
+        new Request(CHANGE_CONTROLLER_ENDPOINT_, {
+          method: 'POST',
+          body: JSON.stringify({
+            "name": encodeURI(newControllerName),
+            "session-id": sessionID
+          })
+    });
+    fetch(request).then(response => {
+      if (!response.ok) {
+        throw new Error('No contact with server,' + 
+            'unsuccessful in changing controller!');
+      }
+    });
   }
 
   /**
@@ -65,7 +87,7 @@ class ServerClient {
    * @return {Promise} The Promise object
    */
   getSession() {
-    throw new Error('Unimplemented');
+    return this.sessionCache_.getSession();
   }
 }
 

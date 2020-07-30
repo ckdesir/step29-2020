@@ -1,4 +1,4 @@
-import { Session } from './Session';
+import { Session } from './session.js';
 
 test('Check for correct value of sessionId', () => {
     const sessionId = "LYW23902"; 
