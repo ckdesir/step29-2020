@@ -29,11 +29,11 @@ public class GetSessionServlet extends HttpServlet {
     String name = URLDecoder.decode(request.getParameter("name"), StandardCharsets.UTF_8);
     AttendeeInterface updatedAttendee = new Attendee(sessionId, name, new Date());
     datastoreClient.insertOrUpdateAttendee(updatedAttendee);
-    Optional<Session> session;
+    Optional<SessionInterface> session;
     try {
       session = datastoreClient.getSession(sessionId);
       if (session.isPresent()) {
-        Optional<List<String>> listOfAttendees;
+        Optional<List<AttendeeInterface>> listOfAttendees;
         try {
           listOfAttendees = datastoreClient.getListOfAttendeesInSession(sessionId);
           if(listOfAttendees.isPresent()) {
