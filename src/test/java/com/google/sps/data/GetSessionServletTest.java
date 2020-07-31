@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import javax.servlet.ServletException;
@@ -44,9 +46,6 @@ public class GetSessionServletTest {
   @Mock
   HttpServletResponse response;
 
-  @Mock
-  DatastoreClientInterface datastoreClient;
-
   @Spy
   GetSessionServlet servlet;
 
@@ -63,11 +62,25 @@ public class GetSessionServletTest {
 
   @Test
   public void testDoGet() throws Exception {
-    DatastoreClientInterface datastoreClient = mock(DatastoreClient.class);
-    DatastoreService datastoreMock = mock(DatastoreService.class);
-    PreparedQuery pqMock = mock(PreparedQuery.class);
-    Session mockSession = mock(Session.class);
-    PowerMockito.mockStatic(Session.class);
+    SessionInterface expectedSession =
+        new Session("EEEEE7", Optional.of("Jessica"), Optional.of("12.34.56.78"));
+    AttendeeInterface expectedAttendee =
+        new Attendee("EEEEE7", "Jessica", new Date());
+    DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+    DatastoreClientInterface datastoreClient = new DatastoreClient();
+    datastoreClient.insertOrUpdateSession(expectedSession);
+    datastoreClient.insertOrUpdateAttendee(expectedAttendee);
+    when(request.getParameter("session-id")).thenReturn("EEEEE7");
+    when(request.getParameter("name")).thenReturn("Jessica");
+
+
+
+
+    // DatastoreClientInterface datastoreClient = mock(DatastoreClient.class);
+    // DatastoreService datastoreMock = mock(DatastoreService.class);
+    // PreparedQuery pqMock = mock(PreparedQuery.class);
+    // Session mockSession = mock(Session.class);
+    // PowerMockito.mockStatic(Session.class);
     //AttendeeInterface attendee = mock(Attendee.class);
     Optional<Session> expectedSession =
         Optional.of(new Session("EEEEE7", Optional.of("Jessica"), Optional.of("12.34.56.78")));
@@ -77,8 +90,6 @@ public class GetSessionServletTest {
     when(Session.fromEntity(expectedSession.get().toEntity())).thenReturn(expectedSession.get());
     List<String> listOfAttendees = Arrays.asList("Jessica", "Bradley", "Noel");
     doNothing().when(datastoreClient).insertOrUpdateAttendee(any());
-    when(request.getParameter("session-id")).thenReturn("EEEEE7");
-    when(request.getParameter("name")).thenReturn("Jessica");
     Mockito.doReturn(expectedSession).when(datastoreClient).getSession("EEEEE7");
     //when(datastoreClient.getSession(anyString())).thenReturn(expectedSession);
     Mockito.doReturn(Optional.of(listOfAttendees)).when(datastoreClient).getListOfAttendeesInSession("EEEEE7");
