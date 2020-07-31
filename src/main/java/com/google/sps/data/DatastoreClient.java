@@ -11,12 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import com.google.sps.data.Attendee;
-import com.google.sps.data.AttendeeInterface;
-import com.google.sps.data.Session;
-import com.google.sps.data.SessionInterface;
-import com.google.sps.data.Instance;
-import com.google.sps.data.InstanceInterface;
 
 /** Class that reads from and writes to Datastore. */
 public class DatastoreClient implements DatastoreClientInterface {
@@ -51,7 +45,7 @@ public class DatastoreClient implements DatastoreClientInterface {
    * Returns the Session object associated with given sessionId. If 
    * return Optional is empty, then no object exists with given parameter.
    */
-  public Optional<Session> getSession(String sessionId) {
+  public Optional<SessionInterface> getSession(String sessionId) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query getSession = new Query(EntityConstants.SessionEntity.TABLE_NAME)
       .setFilter(new FilterPredicate(EntityConstants.SessionEntity.SESSION_ID,
@@ -65,7 +59,7 @@ public class DatastoreClient implements DatastoreClientInterface {
     * Returns the Instance object associated with given instanceName. If 
     * return Optional is empty, then no object exists with given parameter. 
     */  
-  public Optional<Instance> getInstance(String instanceName) {
+  public Optional<InstanceInterface> getInstance(String instanceName) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query getInstance = new Query(EntityConstants.InstanceEntity.TABLE_NAME)
       .setFilter(new FilterPredicate
@@ -80,7 +74,7 @@ public class DatastoreClient implements DatastoreClientInterface {
    * Returns the Attendee object associated with given screenName. If 
    * return Optional is empty, then no object exists with given parameter.
    */  
-  public Optional<Attendee> getAttendee(String screenName) {
+  public Optional<AttendeeInterface> getAttendee(String screenName) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query getAttendee = new Query(EntityConstants.AttendeeEntity.TABLE_NAME)
       .setFilter(new FilterPredicate
@@ -104,7 +98,7 @@ public class DatastoreClient implements DatastoreClientInterface {
     }
 
   /** Returns a list of attendees in a session. */
-  public List<Attendee> getAttendeesInSession
+  public List<AttendeeInterface> getAttendeesInSession
     (String sessionId) {
       DatastoreService datastore = 
         DatastoreServiceFactory.getDatastoreService();
@@ -113,7 +107,7 @@ public class DatastoreClient implements DatastoreClientInterface {
         (EntityConstants.AttendeeEntity.SESSION_ID, FilterOperator.EQUAL, 
         sessionId));
       PreparedQuery results = datastore.prepare(query);
-      List<Attendee> attendeeList = new ArrayList<>();
+      List<AttendeeInterface> attendeeList = new ArrayList<>();
       for (Entity attendeeEntity : results.asIterable()) {
         attendeeList.add(Attendee.fromEntity(attendeeEntity));
       }
