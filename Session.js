@@ -1,3 +1,5 @@
+import { Attendee } from './Attendee.js'
+
 /** Attendee Class */
 class Session { 
     constructor(sessionId, ipOfVM, listOfAttendees, screenNameOfController) { 
@@ -38,7 +40,12 @@ class Session {
         const session = new Session();
         session.sessionId_ = obj.sessionId;
         session.ipOfVM_ = obj.ipOfVM;
-        session.listOfAttendees_ = obj.listOfAttendees;
+        const attendeeArray = [];
+        for(let i = 0; i < obj.listOfAttendees_.length; i++) {
+          attendeeArray.push(Attendee.fromObject(obj.listOfAttendees_[i]);)
+        }
+        //attendeeArray.push()
+        session.listOfAttendees_ = attendeeArray//obj.listOfAttendees;
         session.screenNameOfController_ = obj.screenNameOfController;
         return session;
     }
