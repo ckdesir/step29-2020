@@ -79,8 +79,8 @@ public class Session implements SessionInterface {
   /** Returns a new Entity of kind "Session" from a Session object. */
   public Entity toEntity() {
     Entity sessionEntity = 
-        new Entity(/*kind=*/ EntityConstants.SessionEntity.TABLE_NAME, 
-        /*keyName=*/ this.sessionId);
+        new Entity(/*kind=*/EntityConstants.SessionEntity.TABLE_NAME, 
+        /*keyName=*/this.sessionId);
     sessionEntity.setProperty 
         (EntityConstants.SessionEntity.SESSION_ID, this.sessionId);
     if (this.getScreenNameOfController().isPresent()) {

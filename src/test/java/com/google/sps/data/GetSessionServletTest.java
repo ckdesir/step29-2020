@@ -57,7 +57,7 @@ public class GetSessionServletTest {
   }
 
   @Test
-  public void testDoGet() throws Exception {
+  public void testDoGetGoodRequest() throws Exception {
     SessionInterface expectedSession =
         new Session("EEEEE7", Optional.of("Jessica"), Optional.of("12.34.56.78"));
     AttendeeInterface expectedAttendee =
@@ -77,5 +77,16 @@ public class GetSessionServletTest {
     servlet.doGet(request, response);
     String actualJson = sw.getBuffer().toString().trim();
     Assert.assertEquals(expectedJson, actualJson);
+    Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
+  }
+
+  @Test
+  public void testDoGetBadRequest() throws Exception {
+    // SessionInterface expectedSession =
+    //     new Session("EEEE7", Optional.of("Jessica"), Optional.of("12.34.56.78"));
+    //datastoreClient.insertOrUpdateSession(expectedSession);
+    Mockito.when(request.getParameter("session-id")).thenReturn("EEEEE7");
+    Mockito.when(request.getParameter("name")).thenReturn("Jessica");
+    Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
   }
 }

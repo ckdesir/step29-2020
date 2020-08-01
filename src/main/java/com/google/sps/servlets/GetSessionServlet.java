@@ -4,7 +4,6 @@ import com.google.sps.data.Attendee;
 import com.google.sps.data.AttendeeInterface;
 import com.google.sps.data.DatastoreClient;
 import com.google.sps.data.DatastoreClientInterface;
-import com.google.sps.data.Session;
 import com.google.sps.data.SessionInterface;
 import com.google.gson.*;
 import java.io.IOException;
@@ -29,26 +28,18 @@ public class GetSessionServlet extends HttpServlet {
     String name = URLDecoder.decode(request.getParameter("name"), StandardCharsets.UTF_8);
     AttendeeInterface updatedAttendee = new Attendee(sessionId, name, new Date());
     datastoreClient.insertOrUpdateAttendee(updatedAttendee);
-    Optional<SessionInterface> session;
-    try {
-      session = datastoreClient.getSession(sessionId);
-      if (session.isPresent()) {
-        List<AttendeeInterface> listOfAttendees;
-        try {
-          listOfAttendees = datastoreClient.getAttendeesInSession(sessionId);
-          Gson gson = new Gson();
-          JsonElement jsonElement = gson.toJsonTree(session.get());
-          jsonElement.getAsJsonObject().addProperty("listOfAttendees", gson.toJson(listOfAttendees));
-          String json = gson.toJson(jsonElement);
-          response.setContentType("application/json;");
-          response.setStatus(HttpServletResponse.SC_OK);
-          response.getWriter().println(json);
-        } catch (Exception e) {
-          //throw NoAttendeesFoundException();
-        }
-      }  
-    } catch (Exception e1) {
-      //throw NoSessionFoundException();
-    }
+    Optional<SessionInterface> session = datastoreClient.getSession(sessionId);
+    if (session.isPresent()) {
+      List<AttendeeInterface> listOfAttendees = datastoreClient.getAttendeesInSession(sessionId);
+      Gson gson = new Gson();
+      JsonElement jsonElement = gson.toJsonTree(session.get());
+      jsonElement.getAsJsonObject().addProperty("listOfAttendees", gson.toJson(listOfAttendees));
+      String json = gson.toJson(jsonElement);
+      response.setContentType("application/json;");
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.getWriter().println(json);
+    } else {
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }  
   }
 }
