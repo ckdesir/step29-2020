@@ -1,4 +1,7 @@
 import * as sessionscript from './session-script';
+import { ServerClient } from './serverclient';
+import { Session } from './session';
+import { NoVNCClient } from './novncclient';
 
 test('display none to block', () => {
   document.body.innerHTML = '<div id="container"></div>';
@@ -77,6 +80,40 @@ test('addOnClickTo', () => {
   document.execCommand = jest.fn();
   sessionIdInput.click();
   expect(document.execCommand).toHaveBeenCalledWith('copy');
+});
+
+test('connectCallback', () => {
+  document.body.innerHTML = '';
+  const testElement = document.createElement('div');
+  testElement.style.display = 'block';
+  testElement.id = 'session-status';
+  sessionscript.connectCallback();
+  expect(testElement.style.display).toEqual('none');
+});
+
+test('disconnectCallback', (done) => {
+  document.body.innerHTML = '';
+  const testElement = document.createElement('div');
+  testElement.style.display = 'none';
+  const serverClientSpy = 
+      jest.spyOn(ServerClient.prototype, 'getSession').
+          mockReturnValue(new Promise((resolve, reject) => {
+            resolve(Session.fromObject({
+              sessionId: 'EEEE7',
+              ipOfVM: '1.2.3.4.5.6.7',
+              screenNameOfController: 'chris',
+              listOfAttendees: ['chris', 'bryan']
+            }));          
+          }));
+  const remoteToSessionSpy = 
+      jest.spyOn(NoVNCClient.prototype, 'remoteToSession');
+  sessionscript.disconnectCallback();
+  setTimeout(() => {
+    expect(testElement.style.display).toEqual('block');
+    expect(remoteToSessionSpy).
+        toHaveBeenCalledWith('1.2.3.4.5.6.7', 'EEEE7');
+    done();
+  }, 5000);
 });
 
 /**

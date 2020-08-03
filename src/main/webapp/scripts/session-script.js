@@ -135,4 +135,4 @@ function disconnectCallback() {
 }
 
 export { openSessionInfo, closeParentDisplay, copyTextToClipboard, 
-  addOnClickListenerToElements };
+  addOnClickListenerToElements, connectCallback, disconnectCallback };
