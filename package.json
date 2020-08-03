@@ -1,0 +1,44 @@
+{
+  "name": "step29-2020",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckdesir/step29-2020.git"
+  },
+  "babel": {
+    "env": {
+      "test": {
+        "plugins": [
+          "@babel/plugin-transform-modules-commonjs"
+        ]
+      }
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ckdesir/step29-2020/issues"
+  },
+  "homepage": "https://github.com/ckdesir/step29-2020#readme",
+  "devDependencies": {
+    "@babel/core": "^7.10.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "jest": "^26.1.0",
+    "jest-dom": "^4.0.0"
+  },
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-rewire": "^1.2.0",
+    "es6-promise": "^4.2.8",
+    "isomorphic-fetch": "^2.2.1",
+    "jest-fetch-mock": "^3.0.3",
+    "yarn": "^1.22.4"
+  }
+}

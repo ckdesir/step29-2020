@@ -1,3 +1,5 @@
+package com.google.sps; 
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +74,7 @@ public class SessionTest {
     SessionInterface session = new Session("12345", controller, ipOfVm);
     Entity sessionEntity = session.toEntity();
     SessionInterface newSession = Session.fromEntity(sessionEntity);
-    Assert.assertTrue(session.equals(newSession));
+    Assert.assertEquals(session, newSession);
   }
 
   @Test
