@@ -1,4 +1,4 @@
-package com.google.sps; 
+package com.google.sps.data;
 
 import java.util.Date;
 import org.junit.Assert;
@@ -10,8 +10,6 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import org.junit.After;
 import org.junit.Before;
-import com.google.sps.data.Attendee;
-import com.google.sps.data.AttendeeInterface;
 
 /** Class that test the methods in the Attendee class. */
 @RunWith(JUnit4.class)

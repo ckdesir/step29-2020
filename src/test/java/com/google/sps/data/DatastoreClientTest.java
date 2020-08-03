@@ -1,6 +1,5 @@
 package com.google.sps.data;
 
-import static com.google.appengine.api.datastore.FetchOptions.Builder.withLimit;
 import org.junit.Assert;
 import org.junit.Test;
 import com.google.appengine.api.datastore.Query;
@@ -10,27 +9,18 @@ import org.junit.After;
 import org.junit.Before;
 import java.util.Date;
 import java.util.Optional;
-import com.google.sps.data.Attendee;
-import com.google.sps.data.AttendeeInterface;
-import com.google.sps.data.Session;
-import com.google.sps.data.SessionInterface;
-import com.google.sps.data.Instance;
-import com.google.sps.data.InstanceInterface;
-import com.google.sps.data.DatastoreClient;
-import com.google.sps.data.DatastoreClientInterface;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import java.util.ArrayList;
 import java.util.List;
 
 /* Class that test the methods in DatastoreClient. */
 public class DatastoreClientTest  {
   private final LocalServiceTestHelper helper =
-    new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+      new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
   private final DatastoreClientInterface datastoreClient = 
-    new DatastoreClient();
+      new DatastoreClient();
   private final DatastoreService DatastoreService = 
-    DatastoreServiceFactory.getDatastoreService();
+      DatastoreServiceFactory.getDatastoreService();
 
   @Before
   public void setUp() {

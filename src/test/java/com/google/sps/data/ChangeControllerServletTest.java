@@ -3,20 +3,15 @@ package com.google.sps.data;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Optional;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.sps.servlets.ChangeControllerServlet;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -24,7 +24,8 @@ public class GetSessionServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     DatastoreClientInterface datastoreClient = new DatastoreClient();
-    String sessionId = URLDecoder.decode(request.getParameter("session-id"), StandardCharsets.UTF_8);
+    String sessionId = 
+        URLDecoder.decode(request.getParameter("session-id"), StandardCharsets.UTF_8);
     String name = URLDecoder.decode(request.getParameter("name"), StandardCharsets.UTF_8);
     AttendeeInterface updatedAttendee = new Attendee(sessionId, name, new Date());
     datastoreClient.insertOrUpdateAttendee(updatedAttendee);
@@ -36,10 +37,7 @@ public class GetSessionServlet extends HttpServlet {
       jsonElement.getAsJsonObject().addProperty("listOfAttendees", gson.toJson(listOfAttendees));
       String json = gson.toJson(jsonElement);
       response.setContentType("application/json;");
-      response.setStatus(HttpServletResponse.SC_OK);
       response.getWriter().println(json);
-    } else {
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    }  
+    }
   }
 }

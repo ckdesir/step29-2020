@@ -1,4 +1,4 @@
-package com.google.sps;
+package com.google.sps.data;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,8 +9,6 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import org.junit.After;
 import org.junit.Before;
-import com.google.sps.data.Instance;
-import com.google.sps.data.InstanceInterface;
 import java.util.Optional;
 
 /** Class that test the methods in the Instance class. */

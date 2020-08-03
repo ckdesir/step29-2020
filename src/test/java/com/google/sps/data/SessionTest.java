@@ -1,4 +1,4 @@
-package com.google.sps; 
+package com.google.sps.data;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,11 +9,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import org.junit.After;
 import org.junit.Before;
-import com.google.sps.data.Session;
-import com.google.sps.data.SessionInterface;
 import java.util.Optional;
-import java.util.ArrayList;
-import java.util.List;
 
 /** Class that tests the methods in the Session class. */
 @RunWith(JUnit4.class)

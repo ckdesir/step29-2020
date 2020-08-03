@@ -1,6 +1,5 @@
 package com.google.sps.servlets;
 
-<<<<<<< HEAD
 import com.google.sps.data.DatastoreClient;
 import com.google.sps.data.DatastoreClientInterface;
 import com.google.sps.data.Session;
@@ -9,9 +8,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-=======
-import java.io.IOException;
->>>>>>> ae7322a7d9daa51d6d9878fb4c1cd0c50090aa85
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
