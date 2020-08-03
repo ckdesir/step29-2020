@@ -66,7 +66,9 @@ class NoVNCClient {
    * Method disconnect() disconnects from the server.
    */
   disconnect() {
-    throw new Error('Unimplemeted');
+    if(this.rfbConnection_) {
+      this.rfbConnection_.disconnect();
+    }
   }
 
   /**
