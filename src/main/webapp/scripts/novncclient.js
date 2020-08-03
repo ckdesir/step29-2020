@@ -79,7 +79,9 @@ class NoVNCClient {
    *    being sent to the server.
    */
   setViewOnly(viewOnly) {
-    throw new Error('Unimplemented');
+    if(this.rfbConnection_) {
+      this.rfbConnection_.viewOnly = viewOnly
+    }
   }
 }
 
