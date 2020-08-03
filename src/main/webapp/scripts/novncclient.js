@@ -53,7 +53,13 @@ class NoVNCClient {
    * @param {string} sessionId represents the id of the current session.
    */
   remoteToSession(ipOfVM, sessionId) {
-    throw new Error('Unimplemented');
+    const /** string */ url = `wss://${ipOfVM}:6080`;
+    this.rfbConnection_ = new RFB(this.rfbConnectionElement_, url,
+        { credentials: { password: sessionId } });
+    this.rfbConnection_.addEventListener('connect', this.connectCallback_);
+    this.rfbConnection_.addEventListener(
+        'disconnect', this.disconnectCallback_);
+    this.rfbConnection_.viewOnly = true;
   }
 
   /**
