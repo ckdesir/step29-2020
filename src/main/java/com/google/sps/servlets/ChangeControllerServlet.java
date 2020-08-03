@@ -29,8 +29,8 @@ public class ChangeControllerServlet extends HttpServlet {
           new Session(sessionId, Optional.of(name), sessionInterface.get().getIpOfVM());
       datastoreClient.insertOrUpdateSession(updatedSession);
       response.setStatus(HttpServletResponse.SC_OK);
-    } else {
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      return;
     }
+    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
   }
 }
